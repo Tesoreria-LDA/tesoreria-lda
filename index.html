@@ -152,6 +152,10 @@ tr:hover td{background:var(--surface2)}
     <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Control de pagos, gastos y estados de cuenta</div>
   </div>
   <div class="hdr-r">
+    <button class="btn-login" style="background:rgba(255,255,255,.15);font-size:12px;padding:5px 11px" onclick="exportBackup()" title="Descargar copia de seguridad">💾 Backup</button>
+    <label class="btn-login" style="background:rgba(255,255,255,.15);font-size:12px;padding:5px 11px;cursor:pointer" title="Restaurar desde backup">
+      📂 Restaurar<input type="file" accept=".json" style="display:none" onchange="importBackup(this)">
+    </label>
     <div class="sync-s" id="sync-status">No conectado</div>
     <button class="btn-login" onclick="toggleDrive()">Conectar Drive</button>
   </div>
@@ -518,6 +522,7 @@ const CLIENT_ID='813198682073-g4s4u28p2vers0ndq0uo90354tkh4nbj.apps.googleuserco
 const SCOPES='https://www.googleapis.com/auth/drive.appdata';
 const FILE_NAME='logia_lucero_del_alba_v4.json';
 let tokenClient=null,accessToken=null,driveFileId=null,syncTimer=null;
+let driveReady=false; // ← protección: no guardar en Drive hasta que la carga esté completa
 
 function initGA(){
   if(typeof google==='undefined'){setTimeout(initGA,500);return;}
@@ -529,7 +534,7 @@ function initGA(){
   }});
 }
 function toggleDrive(){
-  if(accessToken){google.accounts.oauth2.revoke(accessToken,()=>{});accessToken=null;driveFileId=null;setSS('No conectado','');document.querySelector('.btn-login').textContent='Conectar Drive';}
+  if(accessToken){google.accounts.oauth2.revoke(accessToken,()=>{});accessToken=null;driveFileId=null;driveReady=false;setSS('No conectado','');document.querySelector('.btn-login').textContent='Conectar Drive';}
   else tokenClient.requestAccessToken();
 }
 function setSS(m,c){const e=document.getElementById('sync-status');e.textContent=m;e.className='sync-s'+(c?' '+c:'');}
@@ -550,16 +555,26 @@ async function findOrCreate(){
   driveFileId=(await r.json()).id;
 }
 async function loadFromDrive(){
+  driveReady=false; // bloquear guardado mientras carga
   setSS('Cargando...','');
   try{
     await findOrCreate();
     const r=await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{'Authorization':'Bearer '+accessToken}});
-    if(r.ok){applyAppData(await r.json());setSS('Sincronizado ✓','ok');}
+    if(r.ok){
+      const data=await r.json();
+      // Solo aplicar si Drive tiene más datos que lo local (protección extra)
+      const driveCount=(data.payments||[]).length+(data.gastos||[]).length+(data.misc||[]).length;
+      const localCount=payments.length+gastos.length+misc.length;
+      if(driveCount>=localCount){applyAppData(data);}
+      else{console.warn('Drive tiene menos datos que local — se mantienen datos locales');}
+      setSS('Sincronizado ✓','ok');
+    }
   }catch(e){setSS('Error al cargar','err');console.error(e);}
+  driveReady=true; // habilitar guardado solo después de cargar
   renderAll();
 }
 async function saveToDrive(){
-  if(!accessToken||!driveFileId){saveLocal();return;}
+  if(!accessToken||!driveFileId||!driveReady){saveLocal();return;}
   setSS('Guardando...','');
   try{
     await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify(getAppData())});
@@ -567,6 +582,32 @@ async function saveToDrive(){
   }catch(e){setSS('Error al guardar','err');saveLocal();}
 }
 function schedSave(){saveLocal();clearTimeout(syncTimer);syncTimer=setTimeout(saveToDrive,1500);}
+
+// ── BACKUP JSON ──────────────────────────────────────────────
+function exportBackup(){
+  const data=JSON.stringify(getAppData(),null,2);
+  const fecha=new Date().toISOString().slice(0,10);
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(data);
+  a.download=`backup_lda_${fecha}.json`;
+  a.click();
+}
+function importBackup(input){
+  const f=input.files[0];if(!f)return;
+  if(!confirm('¿Restaurar datos desde este backup? Se reemplazarán los datos actuales.'))return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      applyAppData(d);
+      driveReady=true;
+      schedSave();
+      renderAll();
+      alert('✅ Backup restaurado correctamente.');
+    }catch(err){alert('Error al leer el archivo. Asegúrate de que sea un backup válido.');}
+  };
+  r.readAsText(f);
+}
 
 // ── DATA MODEL ───────────────────────────────────────────────
 const MS=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
