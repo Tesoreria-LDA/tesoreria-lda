@@ -20,8 +20,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f4f1eb;color:#1a1a1
   --pur:#3c3489;--pur-bg:#eeedfe;--pur-bd:#afa9ec;
   --radius:10px;--radius-sm:6px;
 }
+/* ── LOGIN SCREEN ── */
+.login-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0}
+.login-box{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:90%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block}
+.login-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:1.5rem}
+.login-input{width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:15px;text-align:center;letter-spacing:4px;margin-bottom:10px;font-family:inherit}
+.login-input:focus{outline:none;border-color:var(--navy)}
+.login-btn{width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.login-btn:hover{background:var(--navy2)}
+.login-err{color:var(--bad);font-size:13px;margin-top:8px;min-height:18px}
+/* ── APP ── */
 .app{max-width:1060px;margin:0 auto;padding:1.25rem}
-.hdr{display:flex;align-items:center;gap:16px;padding:1.25rem 1.5rem;background:var(--navy);border-radius:var(--radius);margin-bottom:1.25rem}
+.hdr{display:flex;align-items:center;gap:16px;padding:1.25rem 1.5rem;background:var(--navy);border-radius:var(--radius);margin-bottom:1.25rem;flex-wrap:wrap}
 .logo{width:50px;height:50px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--gold)}
 .hdr-r{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sync-s{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8)}
@@ -83,9 +95,46 @@ tr:hover td{background:var(--surface2)}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .print-area{background:var(--surface);padding:1.5rem;border:1px solid var(--border);border-radius:var(--radius)}
+/* ── RESPONSIVE MÓVIL ── */
+@media(max-width:640px){
+  .app{padding:.75rem}
+  .hdr{padding:1rem;gap:10px}
+  .hdr-r{width:100%;justify-content:flex-end}
+  .hdr-r .sync-s{display:none}
+  .nav{gap:4px}
+  .nb{padding:6px 10px;font-size:12px}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:1fr}
+  .fgrid>[style*="grid-column"]{grid-column:1!important}
+  table{font-size:12px}
+  th,td{padding:6px 7px}
+  .period-bar{gap:8px}
+  .period-bar select,.period-bar input{font-size:12px}
+  .met-v{font-size:18px}
+  .card{padding:1rem}
+  .btn{padding:7px 14px;font-size:12px}
+  .fb{flex-direction:column;align-items:flex-start}
+  .fb .btn{width:100%;text-align:center}
+  #view-historial table thead{display:none}
+  #view-historial table tr{display:block;border-bottom:1px solid var(--border);padding:8px 0}
+  #view-historial table td{display:flex;justify-content:space-between;border:none;padding:3px 8px}
+  #view-historial table td:before{content:attr(data-label);font-weight:600;color:var(--text2);font-size:11px;flex-shrink:0;margin-right:8px}
+}
 </style>
 </head>
 <body>
+
+<!-- PANTALLA DE ACCESO -->
+<div id="login-screen" class="login-screen">
+  <div class="login-box">
+    <img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo" class="login-logo">
+    <div class="login-title">Logia Lucero del Alba</div>
+    <div class="login-sub">Tesorería — Acceso restringido</div>
+    <input type="password" class="login-input" id="login-pw" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
 
 <div id="lov" class="loading-ov">
   <div class="spinner"></div>
@@ -95,11 +144,8 @@ tr:hover td{background:var(--surface2)}
 <div class="app" id="main-app" style="display:none">
 
 <div class="hdr">
-  <div class="logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <polygon points="14,3 17,10 25,10 19,15 21,22 14,18 7,22 9,15 3,10 11,10" fill="none" stroke="#D4A843" stroke-width="1.5"/>
-      <circle cx="14" cy="14" r="3" fill="#D4A843"/>
-    </svg>
+  <div class="logo" style="background:none;border:none;padding:0">
+    <img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo Logia" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
   </div>
   <div>
     <div style="font-size:17px;font-weight:600;color:#fff">Logia Lucero del Alba — Tesorería</div>
@@ -142,6 +188,9 @@ tr:hover td{background:var(--surface2)}
 <div id="view-dashboard" class="view active">
   <div class="metrics" id="dash-metrics"></div>
   <div id="dash-alerts"></div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">
+    <button class="btn bs bsm" onclick="exportResumen()">📋 Copiar resumen para directiva</button>
+  </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
     <div class="card"><div class="ct">Deudores en el período</div><div id="dash-morosos"></div></div>
     <div class="card"><div class="ct">Últimos movimientos</div><div id="dash-ultimos"></div></div>
@@ -393,6 +442,77 @@ tr:hover td{background:var(--surface2)}
 </div>
 
 <script>
+// ── ACCESO CON CLAVE ────────────────────────────────────────
+const APP_PASS='lda2024';
+function doLogin(){
+  const pw=document.getElementById('login-pw').value;
+  if(pw===APP_PASS){
+    document.getElementById('login-screen').style.display='none';
+    sessionStorage.setItem('lda_auth','1');
+  } else {
+    const err=document.getElementById('login-err');
+    err.textContent='Clave incorrecta. Intenta nuevamente.';
+    document.getElementById('login-pw').value='';
+    document.getElementById('login-pw').focus();
+    setTimeout(()=>err.textContent='',3000);
+  }
+}
+
+// ── RESUMEN PARA DIRECTIVA ──────────────────────────────────
+function exportResumen(){
+  const{from,to}=getPeriod();
+  const cm_=cm();
+  const activos=members.filter(x=>x.ingreso<=to);
+  const ingPer=payments.filter(p=>p.fecha.slice(0,7)>=from&&p.fecha.slice(0,7)<=to).reduce((a,p)=>a+p.monto,0)
+    +misc.filter(p=>p.fecha.slice(0,7)>=from&&p.fecha.slice(0,7)<=to).reduce((a,p)=>a+p.monto,0);
+  const gasPer=gastos.filter(g=>g.fecha.slice(0,7)>=from&&g.fecha.slice(0,7)<=to).reduce((a,g)=>a+g.monto,0);
+  const saldoAnt=getSaldoAnterior(from);
+  const saldoFinal=saldoAnt+(ingPer-gasPer);
+  let deudaTotal=0;
+  const morosos=[];
+  activos.forEach(mb=>{
+    const paid=paidMeses(mb.id);const partial=partialMeses(mb.id);
+    let deuda=0;let mesesD=0;let c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
+    while(c<=cm_){
+      if(!paid.has(c)&&!isEx(mb.id,c)&&c>=mb.ingreso){
+        const[y,mo]=c.split('-').map(Number);
+        if(new Date()>=new Date(y,mo-1,6)){deuda+=mDeuda(mb.id,c);mesesD++;}
+      }
+      c=ma(c,1);
+    }
+    if(deuda>0){deudaTotal+=deuda;morosos.push({name:mb.name,deuda,meses:mesesD});}
+  });
+  morosos.sort((a,b)=>b.deuda-a.deuda);
+  const fechaHoy=new Date().toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'});
+  let txt=`📊 RESUMEN TESORERÍA — LOGIA LUCERO DEL ALBA\n`;
+  txt+=`Período: ${fmes(from)} – ${fmes(to)}\n`;
+  txt+=`Generado: ${fechaHoy}\n`;
+  txt+=`─────────────────────────────\n`;
+  txt+=`💰 Saldo anterior al período: ${fm(saldoAnt)}\n`;
+  txt+=`📈 Ingresos del período:       ${fm(ingPer)}\n`;
+  txt+=`📉 Gastos del período:         ${fm(gasPer)}\n`;
+  txt+=`✅ Saldo final acumulado:      ${fm(saldoFinal)}\n`;
+  txt+=`─────────────────────────────\n`;
+  txt+=`👥 Hermanos activos: ${activos.length}\n`;
+  txt+=`⚠️  Deuda total acumulada: ${fm(deudaTotal)}\n`;
+  if(morosos.length){
+    txt+=`\n📋 Hermanos con deuda pendiente:\n`;
+    morosos.forEach(m=>{txt+=`  • ${m.name}: ${fm(m.deuda)} (${m.meses} mes${m.meses>1?'es':''})\n`;});
+  } else {
+    txt+=`\n✅ Todos los hermanos están al día.\n`;
+  }
+  txt+=`─────────────────────────────\n`;
+  txt+=`🔗 App: https://tesoreria-lda.github.io/tesoreria-lda/`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelector('[onclick="exportResumen()"]');
+    const orig=btn.textContent;btn.textContent='✅ ¡Copiado al portapapeles!';
+    setTimeout(()=>btn.textContent=orig,2500);
+  }).catch(()=>{
+    const w=window.open('','_blank','width=500,height=400');
+    w.document.write('<pre style="font-family:monospace;padding:1rem;white-space:pre-wrap">'+txt+'</pre>');
+  });
+}
+
 // ── GOOGLE DRIVE ────────────────────────────────────────────
 const CLIENT_ID='813198682073-g4s4u28p2vers0ndq0uo90354tkh4nbj.apps.googleusercontent.com';
 const SCOPES='https://www.googleapis.com/auth/drive.appdata';
@@ -1036,7 +1156,7 @@ function renderEC(){
         <div style="font-size:16px;font-weight:600;margin-top:4px">${mb.name}</div>
         <div style="font-size:13px;color:var(--text2)">${mb.grado} · ${mb.cargo||''} · Ingreso: ${fmes(mb.ingreso)}</div>
       </div>
-      <div style="text-align:right"><div style="font-size:12px;font-weight:600;color:var(--navy)">Logia Lucero del Alba</div><div style="font-size:11px;color:var(--text3)">Generado: ${td()}</div></div>
+      <div style="text-align:right"><img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-bottom:4px;display:block;margin-left:auto"><div style="font-size:12px;font-weight:600;color:var(--navy)">Logia Lucero del Alba</div><div style="font-size:11px;color:var(--text3)">Generado: ${td()}</div></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem">
       <div class="met"><div class="met-l">Cápitas esperadas</div><div class="met-v">${fm(totalEsp)}</div></div>
@@ -1062,7 +1182,7 @@ function renderEC(){
 function printEC(){
   const c=document.getElementById('ec-print');if(!c){alert('Selecciona un hermano primero');return;}
   const w=window.open('','_blank');
-  w.document.write(`<html><head><title>Estado de cuenta</title><style>body{font-family:'Segoe UI',sans-serif;padding:2rem;font-size:13px;color:#1a1a1a}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px 10px}th{background:#f5f2eb}.met{background:#f5f2eb;padding:10px 14px;border-radius:6px;display:inline-block;margin:0 8px 8px 0;min-width:120px}.met-l{font-size:10px;color:#777;text-transform:uppercase}.met-v{font-size:18px;font-weight:700}.ok{color:#2d6a2d}.bad{color:#a32d2d}.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px}.b-ok{background:#eaf3de;color:#2d6a2d}.b-bad{background:#fcebeb;color:#a32d2d}.b-inf{background:#e6f1fb;color:#0c4478}.b-warn{background:#faeeda;color:#7a4f0a}.b-pur{background:#eeedfe;color:#3c3489}</style></head><body>${c.innerHTML}</body></html>`);
+  w.document.write(`<html><head><title>Estado de cuenta</title><style>body{font-family:'Segoe UI',sans-serif;padding:2rem;font-size:13px;color:#1a1a1a}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px 10px}th{background:#f5f2eb}.met{background:#f5f2eb;padding:10px 14px;border-radius:6px;display:inline-block;margin:0 8px 8px 0;min-width:120px}.met-l{font-size:10px;color:#777;text-transform:uppercase}.met-v{font-size:18px;font-weight:700}.ok{color:#2d6a2d}.bad{color:#a32d2d}.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px}.b-ok{background:#eaf3de;color:#2d6a2d}.b-bad{background:#fcebeb;color:#a32d2d}.b-inf{background:#e6f1fb;color:#0c4478}.b-warn{background:#faeeda;color:#7a4f0a}.b-pur{background:#eeedfe;color:#3c3489}img{max-width:100%}</style></head><body>${c.innerHTML}</body></html>`);
   w.document.close();w.focus();setTimeout(()=>w.print(),400);
 }
 
@@ -1146,6 +1266,12 @@ function renderAll(){buildPeriodSelects();refreshSel();renderDash();renderM();re
 
 // ── INIT ─────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
+  // Verificar autenticación
+  if(sessionStorage.getItem('lda_auth')==='1'){
+    document.getElementById('login-screen').style.display='none';
+  } else {
+    setTimeout(()=>document.getElementById('login-pw').focus(),200);
+  }
   loadLocal();
   document.getElementById('pf-fecha').value=td();
   document.getElementById('pf-mes-g').style.display='none';
