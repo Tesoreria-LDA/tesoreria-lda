@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Logia Lucero del Alba — Tesorería</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f4f1eb;color:#1a1a1a;min-height:100vh}
@@ -26,7 +28,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f4f1eb;color:#1a1a1
 .login-logo{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;display:block}
 .login-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:4px}
 .login-sub{font-size:13px;color:var(--text3);margin-bottom:1.5rem}
-.login-input{width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:15px;text-align:center;letter-spacing:4px;margin-bottom:10px;font-family:inherit}
+.login-input{width:100%;padding:10px 14px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);font-size:15px;text-align:center;letter-spacing:normal;margin-bottom:10px;font-family:inherit}
 .login-input:focus{outline:none;border-color:var(--navy)}
 .login-btn{width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .login-btn:hover{background:var(--navy2)}
@@ -129,10 +131,21 @@ tr:hover td{background:var(--surface2)}
   <div class="login-box">
     <img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo" class="login-logo">
     <div class="login-title">Logia Lucero del Alba</div>
-    <div class="login-sub">Tesorería — Acceso restringido</div>
-    <input type="password" class="login-input" id="login-pw" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-sub">Tesorería — Inicia sesión con tu cuenta</div>
+    <input type="email" class="login-input" id="login-email" placeholder="Correo electrónico" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" class="login-input" id="login-pw" placeholder="Contraseña" maxlength="50" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Ingresar</button>
     <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- SELECTOR DE LOGIA (para usuarios multilogía) -->
+<div id="logia-selector" class="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-title">Seleccionar Logia</div>
+    <div class="login-sub">Elige la logia que deseas gestionar</div>
+    <select class="login-input" id="logia-select"></select>
+    <button class="login-btn" onclick="document.getElementById('logia-selector').style.display='none'; document.getElementById('main-app').style.display='block';">Continuar</button>
   </div>
 </div>
 
@@ -145,19 +158,20 @@ tr:hover td{background:var(--surface2)}
 
 <div class="hdr">
   <div class="logo" style="background:none;border:none;padding:0">
-    <img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo Logia" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
+    <img id="logia-logo" src="" alt="Logo Logia" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
   </div>
   <div>
-    <div style="font-size:17px;font-weight:600;color:#fff">Logia Lucero del Alba — Tesorería</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Control de pagos, gastos y estados de cuenta</div>
+    <div id="logia-title" style="font-size:17px;font-weight:600;color:#fff">Logia Lucero del Alba — Tesorería</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Control de pagos, gastos y estados de cuenta · v2.0</div>
   </div>
   <div class="hdr-r">
     <button class="btn-login" style="background:rgba(255,255,255,.15);font-size:12px;padding:5px 11px" onclick="exportBackup()" title="Descargar copia de seguridad">💾 Backup</button>
     <label class="btn-login" style="background:rgba(255,255,255,.15);font-size:12px;padding:5px 11px;cursor:pointer" title="Restaurar desde backup">
       📂 Restaurar<input type="file" accept=".json" style="display:none" onchange="importBackup(this)">
     </label>
+    <select id="admin-logia-switch" class="si" style="display:none;font-size:12px;padding:4px 8px" onchange="adminSwitchLogia(this.value)"></select>
     <div class="sync-s" id="sync-status">No conectado</div>
-    <button class="btn-login" onclick="toggleDrive()">Conectar Drive</button>
+    <button class="btn-login btn-logout" style="background:rgba(255,255,255,.15);font-size:12px;padding:5px 11px;display:none" onclick="doSignOut()" title="Cerrar sesión">Cerrar sesión</button>
   </div>
 </div>
 
@@ -186,6 +200,7 @@ tr:hover td{background:var(--surface2)}
   <button class="nb" onclick="showView('historial',this)">Historial</button>
   <button class="nb" onclick="showView('estado',this)">Estado de cuenta</button>
   <button class="nb" onclick="showView('reportes',this)">Reportes</button>
+  <button class="nb" id="admin-nav" style="display:none" onclick="showView('admin',this)">Admin</button>
 </div>
 
 <!-- DASHBOARD -->
@@ -423,7 +438,52 @@ tr:hover td{background:var(--surface2)}
   </div>
 </div>
 
-<!-- MODAL EDITAR MOVIMIENTO -->
+<!-- ADMIN -->
+<div id="view-admin" class="view">
+  <div class="tabs">
+    <button class="tab active" onclick="showAdminTab('ad-logias',this)">Gestionar Logias</button>
+    <button class="tab" onclick="showAdminTab('ad-usuarios',this)">Gestionar Usuarios</button>
+  </div>
+  <div id="ad-logias">
+    <div class="fb">
+      <input class="si" type="text" placeholder="Nombre de nueva logia" id="new-logia-name" style="width:250px">
+      <button class="btn bp" onclick="createLogia()">Crear Logia</button>
+    </div>
+    <div class="card"><div class="ct">Logias existentes</div><div id="logias-list"></div></div>
+    <div class="card" style="margin-top:1rem">
+      <div class="ct">Subir logo de logia</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px">
+        <select id="logo-logia-select" class="si" style="width:220px"><option value="">Seleccionar logia...</option></select>
+        <label class="btn bp" style="cursor:pointer;margin:0">
+          Elegir imagen<input type="file" id="logo-file" accept="image/*" style="display:none" onchange="document.getElementById('logo-file-name').textContent=this.files[0]?this.files[0].name:''">
+        </label>
+        <span id="logo-file-name" style="font-size:12px;color:var(--text2)"></span>
+        <button class="btn bp" onclick="uploadLogo()">Subir logo</button>
+      </div>
+    </div>
+  </div>
+  <div id="ad-usuarios" style="display:none">
+    <div class="card">
+      <div class="ct">Crear nuevo usuario</div>
+      <div class="fgrid" style="margin-top:8px">
+        <div class="fg"><label>Email</label><input type="email" id="new-user-email" class="si" placeholder="usuario@ejemplo.com"></div>
+        <div class="fg"><label>Contraseña</label><input type="password" id="new-user-pw" class="si" placeholder="Mínimo 6 caracteres"></div>
+        <div class="fg"><label>Rol</label>
+          <select id="new-user-role" class="si">
+            <option value="viewer">Viewer (solo lectura)</option>
+            <option value="editor">Editor (puede guardar datos)</option>
+          </select>
+        </div>
+        <div class="fg"><label>Logias asignadas (IDs separados por coma)</label>
+          <input type="text" id="new-user-logias" class="si" placeholder="logia_lucero_del_alba,logia_hiram_1">
+        </div>
+      </div>
+      <button class="btn bp" style="margin-top:8px" onclick="createUser()">Crear usuario</button>
+      <div id="create-user-msg" style="display:none;margin-top:12px;padding:8px 12px;border-radius:6px;font-size:13px"></div>
+    </div>
+    <div class="card" style="margin-top:1rem"><div class="ct">Usuarios registrados</div><div id="users-list">Cargando...</div></div>
+  </div>
+</div>
 <div id="edit-mov-modal" onclick="if(event.target===this)closeMovEdit()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center">
   <div style="background:var(--surface);border-radius:var(--radius);padding:1.5rem;max-width:480px;width:90%;max-height:90vh;overflow-y:auto">
     <div class="ct" id="em-title">Editar movimiento</div>
@@ -446,21 +506,205 @@ tr:hover td{background:var(--surface2)}
 </div>
 
 <script>
-// ── ACCESO CON CLAVE ────────────────────────────────────────
-const APP_PASS='lda2024';
-function doLogin(){
-  const pw=document.getElementById('login-pw').value;
-  if(pw===APP_PASS){
-    document.getElementById('login-screen').style.display='none';
-    sessionStorage.setItem('lda_auth','1');
-  } else {
-    const err=document.getElementById('login-err');
-    err.textContent='Clave incorrecta. Intenta nuevamente.';
-    document.getElementById('login-pw').value='';
-    document.getElementById('login-pw').focus();
-    setTimeout(()=>err.textContent='',3000);
+// ── FIREBASE / AUTENTICACIÓN Y DATOS ────────────────────────
+const FIREBASE_CONFIG={
+  apiKey:'AIzaSyCKVpNLyBF4nYjcDwIW0j55ZWpHwmWklWo',
+  authDomain:'tesoreria-lda.firebaseapp.com',
+  projectId:'tesoreria-lda',
+  storageBucket:'tesoreria-lda.firebasestorage.app',
+  messagingSenderId:'628479900516',
+  appId:'1:628479900516:web:33b6d237d7f07e4bfdd871'
+};
+let userLogias = [];
+let selectedLogia = null;
+let isAdmin = false;
+let logoUrl = 'https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png';
+let remoteListener = null;
+let syncTimer = null;
+
+function initFirebase(){
+  if(typeof firebase==='undefined'){setTimeout(initFirebase,500);return;}
+  if(!firebase.apps.length){firebase.initializeApp(FIREBASE_CONFIG);}
+  firebase.auth().onAuthStateChanged(async user=>{
+    if(user){
+      const idTokenResult = await user.getIdTokenResult();
+      let role = idTokenResult.claims.role || null;
+      let claimLogias = idTokenResult.claims.logias || null;
+      // Leer permisos desde Firestore (permite gestión sin custom claims)
+      try{
+        const uDoc = await firebase.firestore().doc(`users/${user.uid}`).get();
+        if(uDoc.exists){
+          const ud = uDoc.data();
+          role = role || ud.role;
+          claimLogias = claimLogias || ud.logias;
+        }
+      }catch(e){}
+      isAdmin = user.email === 'cguzman@propertyplus.cl';
+      if(isAdmin){
+        document.getElementById('admin-nav').style.display='inline-flex';
+        document.getElementById('logia-selector').style.display='none';
+        document.getElementById('main-app').style.display='block';
+        await loadAdminLogias();
+      } else {
+        document.getElementById('admin-nav').style.display='none';
+        document.getElementById('admin-logia-switch').style.display='none';
+        userLogias = claimLogias || ['logia_lucero_del_alba'];
+        if(userLogias.length === 1){
+          selectedLogia = userLogias[0];
+          document.getElementById('logia-selector').style.display='none';
+          document.getElementById('main-app').style.display='block';
+        } else {
+          selectedLogia = userLogias[0];
+          populateLogiaSelector();
+          document.getElementById('logia-selector').style.display='block';
+          document.getElementById('main-app').style.display='none';
+        }
+      }
+      document.getElementById('login-screen').style.display='none';
+      document.querySelector('.btn-logout').style.display='inline-flex';
+      setSS(`Conectado: ${user.email}`,'ok');
+      await loadRemoteData();
+    } else {
+      document.getElementById('login-screen').style.display='flex';
+      document.querySelector('.btn-logout').style.display='none';
+      document.getElementById('logia-selector').style.display='none';
+      document.getElementById('main-app').style.display='none';
+      document.getElementById('admin-logia-switch').style.display='none';
+      setSS('No conectado','');
+      renderAll();
+    }
+  });
+}
+function populateLogiaSelector(){
+  const sel = document.getElementById('logia-select');
+  sel.innerHTML = '';
+  userLogias.forEach(logia => {
+    const opt = document.createElement('option');
+    opt.value = logia;
+    opt.textContent = logia.replace(/_/g, ' ').toUpperCase();
+    sel.appendChild(opt);
+  });
+  sel.value = selectedLogia;
+  sel.onchange = () => {
+    selectedLogia = sel.value;
+    // Recargar datos para la nueva logia
+    if(remoteListener){remoteListener();remoteListener=null;}
+    loadRemoteData();
+  };
+  document.getElementById('main-app').style.display='block';
+}
+async function loadAdminLogias(){
+  try{
+    const snap = await firebase.firestore().collection('apps').get();
+    const sel = document.getElementById('admin-logia-switch');
+    sel.innerHTML = snap.docs.map(d=>`<option value="${d.id}">${d.id.replace(/_/g,' ').toUpperCase()}</option>`).join('');
+    if(!selectedLogia || !snap.docs.find(d=>d.id===selectedLogia)) selectedLogia = snap.docs[0]?.id || 'logia_lucero_del_alba';
+    sel.value = selectedLogia;
+    sel.style.display = 'inline-block';
+    userLogias = snap.docs.map(d=>d.id);
+  }catch(e){selectedLogia='logia_lucero_del_alba';}
+}
+function adminSwitchLogia(logia){
+  if(!logia) return;
+  selectedLogia = logia;
+  if(remoteListener){remoteListener();remoteListener=null;}
+  loadRemoteData(true);
+}
+async function createUser(){
+  const email = document.getElementById('new-user-email').value.trim();
+  const pw = document.getElementById('new-user-pw').value;
+  const role = document.getElementById('new-user-role').value;
+  const logiasRaw = document.getElementById('new-user-logias').value.trim();
+  const logias = logiasRaw ? logiasRaw.split(',').map(l=>l.trim()).filter(Boolean) : [];
+  const msg = document.getElementById('create-user-msg');
+  msg.style.display='block'; msg.style.background='var(--inf-bg)'; msg.style.color='var(--inf)';
+  if(!email||!pw){msg.textContent='Email y contraseña son obligatorios.';return;}
+  if(pw.length<6){msg.textContent='La contraseña debe tener mínimo 6 caracteres.';return;}
+  msg.textContent='Creando usuario...';
+  try{
+    const secApp = firebase.apps.find(a=>a.name==='sec') || firebase.initializeApp(FIREBASE_CONFIG,'sec');
+    const cred = await secApp.auth().createUserWithEmailAndPassword(email,pw);
+    const uid = cred.user.uid;
+    await secApp.auth().signOut();
+    await firebase.firestore().doc(`users/${uid}`).set({email,role,logias,createdAt:new Date().toISOString()});
+    msg.style.background='#e6f9ee'; msg.style.color='#1a7a3a';
+    msg.textContent=`✅ Usuario ${email} creado correctamente.`;
+    document.getElementById('new-user-email').value='';
+    document.getElementById('new-user-pw').value='';
+    document.getElementById('new-user-logias').value='';
+    loadUsers();
+  }catch(e){
+    msg.style.background='#fde8e8'; msg.style.color='#b91c1c';
+    msg.textContent='❌ Error: '+e.message;
   }
 }
+function showLoginError(msg){
+  const err=document.getElementById('login-err');
+  err.textContent=msg;
+  if(msg){setTimeout(()=>err.textContent='',4000);}
+}
+function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  if(!email||!pw){showLoginError('Correo y contraseña obligatorios.');return;}
+  firebase.auth().signInWithEmailAndPassword(email,pw).catch(err=>showLoginError(err.message||'Error al iniciar sesión.'));
+}
+function doSignOut(){
+  if(remoteListener){remoteListener();remoteListener=null;}
+  firebase.auth().signOut().catch(()=>{});
+}
+async function loadRemoteData(forceRemote=false){
+  if(forceRemote){
+    members=[];fees=[];exemptions=[];payments=[];gastos=[];misc=[];credits={};updatedAt='';
+  } else {
+    loadLocal();
+  }
+  renderAll();
+  try{
+    const docRef=firebase.firestore().doc(`apps/${selectedLogia}`);
+    const snap=await docRef.get();
+    if(snap.exists){
+      const remoteData=snap.data();
+      if(forceRemote||shouldUseRemote(remoteData)){applyAppData(remoteData);saveLocal();renderAll();}
+      logoUrl = remoteData.logo || 'https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png';
+      document.getElementById('logia-logo').src = logoUrl;
+      const logiaName = remoteData.name || selectedLogia.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      document.getElementById('logia-title').textContent = logiaName + ' — Tesorería';
+    } else if(!forceRemote&&updatedAt){
+      await saveToFirestore();
+    }
+    if(!remoteListener){
+      remoteListener=docRef.onSnapshot(snapshot=>{
+        if(snapshot.exists){
+          const data=snapshot.data();
+          if(shouldUseRemote(data)){applyAppData(data);saveLocal();renderAll();}
+        }
+      },err=>{console.warn('Firestore listener error',err);});
+    }
+  }catch(e){console.error(e);setSS('Error Firestore','err');}
+}
+function shouldUseRemote(remote){
+  if(!remote || !remote.updatedAt) return false;
+  if(!updatedAt) return true;
+  return new Date(remote.updatedAt) > new Date(updatedAt);
+}
+async function saveToFirestore(){
+  saveLocal();
+  const user=firebase.auth().currentUser;
+  if(!user){return;}
+  setSS('Guardando en la nube...','');
+  try{
+    const now=new Date().toISOString();
+    await firebase.firestore().doc(`apps/${selectedLogia}`).set({
+      ...getAppData(),
+      updatedAt:now,
+      lastModifiedBy:user.email
+    });
+    updatedAt=now;
+    setSS(`Guardado: ${user.email}`,'ok');
+  }catch(e){console.error(e);setSS('Error al guardar','err');}
+}
+function schedSave(){saveLocal();clearTimeout(syncTimer);syncTimer=setTimeout(saveToFirestore,1500);}
 
 // ── RESUMEN PARA DIRECTIVA ──────────────────────────────────
 function exportResumen(){
@@ -517,71 +761,7 @@ function exportResumen(){
   });
 }
 
-// ── GOOGLE DRIVE ────────────────────────────────────────────
-const CLIENT_ID='813198682073-g4s4u28p2vers0ndq0uo90354tkh4nbj.apps.googleusercontent.com';
-const SCOPES='https://www.googleapis.com/auth/drive.appdata';
-const FILE_NAME='logia_lucero_del_alba_v4.json';
-let tokenClient=null,accessToken=null,driveFileId=null,syncTimer=null;
-let driveReady=false; // ← protección: no guardar en Drive hasta que la carga esté completa
-
-function initGA(){
-  if(typeof google==='undefined'){setTimeout(initGA,500);return;}
-  tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPES,callback:(r)=>{
-    if(r.error){setSS('Error de autenticación','err');return;}
-    accessToken=r.access_token;setSS('Conectado ✓','ok');
-    document.querySelector('.btn-login').textContent='Desconectar Drive';
-    loadFromDrive();
-  }});
-}
-function toggleDrive(){
-  if(accessToken){google.accounts.oauth2.revoke(accessToken,()=>{});accessToken=null;driveFileId=null;driveReady=false;setSS('No conectado','');document.querySelector('.btn-login').textContent='Conectar Drive';}
-  else tokenClient.requestAccessToken();
-}
 function setSS(m,c){const e=document.getElementById('sync-status');e.textContent=m;e.className='sync-s'+(c?' '+c:'');}
-async function driveReq(method,url,body){
-  const h={'Authorization':'Bearer '+accessToken};
-  if(body&&!(body instanceof FormData))h['Content-Type']='application/json';
-  const r=await fetch(url,{method,headers:h,body:body instanceof FormData?body:(body?JSON.stringify(body):undefined)});
-  if(!r.ok)throw new Error('Drive '+r.status);return r.json();
-}
-async function findOrCreate(){
-  const l=await driveReq('GET',`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${FILE_NAME}'&fields=files(id)`);
-  if(l.files&&l.files.length>0){driveFileId=l.files[0].id;return;}
-  const m={name:FILE_NAME,parents:['appDataFolder']};
-  const f=new FormData();
-  f.append('metadata',new Blob([JSON.stringify(m)],{type:'application/json'}));
-  f.append('file',new Blob([JSON.stringify(getAppData())],{type:'application/json'}));
-  const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+accessToken},body:f});
-  driveFileId=(await r.json()).id;
-}
-async function loadFromDrive(){
-  driveReady=false; // bloquear guardado mientras carga
-  setSS('Cargando...','');
-  try{
-    await findOrCreate();
-    const r=await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,{headers:{'Authorization':'Bearer '+accessToken}});
-    if(r.ok){
-      const data=await r.json();
-      // Solo aplicar si Drive tiene más datos que lo local (protección extra)
-      const driveCount=(data.payments||[]).length+(data.gastos||[]).length+(data.misc||[]).length;
-      const localCount=payments.length+gastos.length+misc.length;
-      if(driveCount>=localCount){applyAppData(data);}
-      else{console.warn('Drive tiene menos datos que local — se mantienen datos locales');}
-      setSS('Sincronizado ✓','ok');
-    }
-  }catch(e){setSS('Error al cargar','err');console.error(e);}
-  driveReady=true; // habilitar guardado solo después de cargar
-  renderAll();
-}
-async function saveToDrive(){
-  if(!accessToken||!driveFileId||!driveReady){saveLocal();return;}
-  setSS('Guardando...','');
-  try{
-    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{method:'PATCH',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify(getAppData())});
-    setSS('Guardado en Drive ✓','ok');
-  }catch(e){setSS('Error al guardar','err');saveLocal();}
-}
-function schedSave(){saveLocal();clearTimeout(syncTimer);syncTimer=setTimeout(saveToDrive,1500);}
 
 // ── BACKUP JSON ──────────────────────────────────────────────
 function exportBackup(){
@@ -600,7 +780,6 @@ function importBackup(input){
     try{
       const d=JSON.parse(e.target.result);
       applyAppData(d);
-      driveReady=true;
       schedSave();
       renderAll();
       alert('✅ Backup restaurado correctamente.');
@@ -616,8 +795,9 @@ const TL={capita:'Cápita',derecho:'Derecho',extraordinaria:'Extraordinaria',mul
 // credits[memberId] = monto acumulado no imputado a ningún mes completo
 let members=[],fees=[],exemptions=[],payments=[],gastos=[],misc=[],credits={};
 let nid=1,nmid=1,nexid=1,nfid=1,ngid=1,niid=1;
+let updatedAt='';
 
-function getAppData(){return{members,fees,exemptions,payments,gastos,misc,credits,nid,nmid,nexid,nfid,ngid,niid,v:4};}
+function getAppData(){return{members,fees,exemptions,payments,gastos,misc,credits,nid,nmid,nexid,nfid,ngid,niid,updatedAt,lastModifiedBy:(typeof firebase!=='undefined'&&firebase.auth&&firebase.auth().currentUser?firebase.auth().currentUser.email:''),v:4};}
 function applyAppData(d){
   if(!d)return;
   members=d.members||[];fees=d.fees||[];exemptions=d.exemptions||[];
@@ -625,9 +805,11 @@ function applyAppData(d){
   credits=d.credits||{};
   nid=d.nid||1;nmid=d.nmid||1;nexid=d.nexid||1;
   nfid=d.nfid||1;ngid=d.ngid||1;niid=d.niid||1;
+  updatedAt=d.updatedAt||updatedAt;
 }
-function saveLocal(){try{localStorage.setItem('lda_v4',JSON.stringify(getAppData()));}catch(e){}}
-function loadLocal(){try{const d=localStorage.getItem('lda_v4');if(d)applyAppData(JSON.parse(d));}catch(e){}}
+function localKey(){return 'lda_v4_'+(selectedLogia||'default');}
+function saveLocal(){try{localStorage.setItem(localKey(),JSON.stringify(getAppData()));}catch(e){}}
+function loadLocal(){try{const d=localStorage.getItem(localKey())||localStorage.getItem('lda_v4');if(d)applyAppData(JSON.parse(d));}catch(e){}}
 
 // ── HELPERS ──────────────────────────────────────────────────
 function fm(n){return'$'+Math.round(n).toLocaleString('es-CL')}
@@ -1299,6 +1481,110 @@ function showTab(id,btn){
   document.getElementById(id).style.display='block';
   if(id==='rt-tes'||id==='rt-gas'||id==='rt-exc')renderRep();
 }
+function showAdminTab(id,btn){
+  document.querySelectorAll('#view-admin .tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['ad-logias','ad-usuarios'].forEach(t=>document.getElementById(t).style.display='none');
+  document.getElementById(id).style.display='block';
+  if(id==='ad-logias')loadLogias();
+  if(id==='ad-usuarios')loadUsers();
+}
+async function createLogia(){
+  const displayName = document.getElementById('new-logia-name').value.trim();
+  const name = displayName.toLowerCase().replace(/\s+/g, '_');
+  if(!name){alert('Ingresa un nombre válido.');return;}
+  try{
+    await firebase.firestore().doc(`apps/${name}`).set({
+      name: displayName,
+      createdAt: new Date().toISOString(),
+      createdBy: firebase.auth().currentUser.email,
+      logo: 'https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png'
+    });
+    document.getElementById('new-logia-name').value = '';
+    loadLogias();
+    alert('Logia creada.');
+  }catch(e){alert('Error: '+e.message);}
+}
+async function loadLogias(){
+  const list = document.getElementById('logias-list');
+  list.innerHTML = 'Cargando...';
+  const sel = document.getElementById('logo-logia-select');
+  if(sel) sel.innerHTML = '<option value="">Seleccionar...</option>';
+  try{
+    const snap = await firebase.firestore().collection('apps').get();
+    const logias = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+    list.innerHTML = logias.map(l => `<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600">${l.name||l.id.replace(/_/g,' ').toUpperCase()}</div><div style="font-size:11px;color:var(--text2);font-family:monospace">ID: ${l.id}</div></div><button class="bd" onclick="deleteLogia('${l.id}')">Eliminar</button></div>`).join('') || 'No hay logias.';
+    if(sel) logias.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.id.replace(/_/g, ' ').toUpperCase();
+      sel.appendChild(opt);
+    });
+  }catch(e){list.innerHTML = 'Error: '+e.message;}
+}
+async function deleteLogia(id){
+  if(!confirm(`¿Eliminar logia ${id}? Se perderán todos los datos.`))return;
+  try{
+    await firebase.firestore().doc(`apps/${id}`).delete();
+    loadLogias();
+    alert('Logia eliminada.');
+  }catch(e){alert('Error: '+e.message);}
+}
+async function uploadLogo(){
+  const logia = document.getElementById('logo-logia-select').value;
+  const file = document.getElementById('logo-file').files[0];
+  if(!logia || !file){alert('Selecciona logia y archivo.');return;}
+  try{
+    const base64 = await resizeImage(file, 200);
+    await firebase.firestore().doc(`apps/${logia}`).update({logo: base64});
+    alert('Logo actualizado.');
+    if(selectedLogia === logia) document.getElementById('logia-logo').src = base64;
+  }catch(e){alert('Error: '+e.message);}
+}
+function resizeImage(file, size){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+async function loadUsers(){
+  const list = document.getElementById('users-list');
+  if(!list) return;
+  list.innerHTML = 'Cargando...';
+  try{
+    const snap = await firebase.firestore().collection('users').get();
+    if(snap.empty){list.innerHTML='<div class="info-b">No hay usuarios creados aún.</div>';return;}
+    list.innerHTML = snap.docs.map(d=>{
+      const u=d.data();
+      return `<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div>
+          <div style="font-weight:600;font-size:13px">${u.email||d.id}</div>
+          <div style="font-size:11px;color:var(--text2)">Rol: <b>${u.role||'?'}</b> · Logias: ${(u.logias||[]).join(', ')||'ninguna'}</div>
+        </div>
+        <button class="bd" onclick="deleteUser('${d.id}')">Eliminar</button>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML='<div class="info-b">Error: '+e.message+'</div>';}
+}
+async function deleteUser(uid){
+  if(!confirm('¿Eliminar permisos de este usuario?')) return;
+  try{
+    await firebase.firestore().doc(`users/${uid}`).delete();
+    loadUsers();
+  }catch(e){alert('Error: '+e.message);}
+}
 function refreshSel(){
   const opts=members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
   ['pf-m','ec-member','rh-sel'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="">Seleccionar...</option>'+opts;});
@@ -1307,12 +1593,7 @@ function renderAll(){buildPeriodSelects();refreshSel();renderDash();renderM();re
 
 // ── INIT ─────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  // Verificar autenticación
-  if(sessionStorage.getItem('lda_auth')==='1'){
-    document.getElementById('login-screen').style.display='none';
-  } else {
-    setTimeout(()=>document.getElementById('login-pw').focus(),200);
-  }
+  setTimeout(()=>document.getElementById('login-email').focus(),200);
   loadLocal();
   document.getElementById('pf-fecha').value=td();
   document.getElementById('pf-mes-g').style.display='none';
@@ -1328,7 +1609,7 @@ window.addEventListener('load',()=>{
   renderAll();
   document.getElementById('lov').style.display='none';
   document.getElementById('main-app').style.display='block';
-  initGA();
+  initFirebase();
 });
 </script>
 </body>
