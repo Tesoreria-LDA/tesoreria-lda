@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://tesoreria-lda.web.app", "https://tesoreria-lda.firebaseapp.com"],
+    "method": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+    "responseHeader": ["Content-Type", "Authorization", "Content-Length"],
+    "maxAgeSeconds": 3600
+  }
+]
