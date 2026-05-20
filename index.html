@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logia Lucero del Alba — Tesorería</title>
+<title>Tesorería — Sistema de gestión</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -122,6 +122,69 @@ tr:hover td{background:var(--surface2)}
   #view-historial table td{display:flex;justify-content:space-between;border:none;padding:3px 8px}
   #view-historial table td:before{content:attr(data-label);font-weight:600;color:var(--text2);font-size:11px;flex-shrink:0;margin-right:8px}
 }
+/* ── TOGGLE ACTIVO ── */
+.toggle-wrap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
+.toggle{position:relative;display:inline-block;width:40px;height:22px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-sl{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:22px;transition:.2s}
+.toggle-sl:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-sl{background:var(--ok)}
+.toggle input:checked+.toggle-sl:before{transform:translateX(18px)}
+.b-inact{background:#f0f0f0;color:#999;border-color:#ddd}
+/* ── NÓMINA ── */
+.nom-tbl{border-collapse:collapse;width:100%;font-size:13px}
+.nom-tbl th,.nom-tbl td{border:1px solid var(--border);padding:7px 10px;text-align:left}
+.nom-tbl th{background:var(--navy);color:#fff;font-weight:500;font-size:12px}
+.nom-tbl tr:nth-child(even) td{background:var(--surface2)}
+/* ── ASISTENCIA ── */
+.asist-tbl{border-collapse:collapse;font-size:12px;white-space:nowrap}
+.asist-tbl th,.asist-tbl td{border:1px solid var(--border);padding:5px 8px;text-align:center}
+.asist-tbl th{background:var(--navy);color:#fff;font-size:11px}
+.asist-tbl td:first-child,.asist-tbl th:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+.asist-tbl th:first-child{background:var(--navy);z-index:2}
+.asist-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--ok)}
+.libro-wrap{overflow-x:auto}
+.libro-tbl{border-collapse:collapse;font-size:12px;white-space:nowrap}
+.libro-tbl th,.libro-tbl td{border:1px solid var(--border);padding:5px 8px;text-align:right}
+.libro-tbl th{background:var(--navy);color:#fff;text-align:center;font-weight:500;font-size:11px;position:sticky;top:0;z-index:1}
+.libro-tbl td:first-child,.libro-tbl th:first-child{text-align:left;position:sticky;left:0;z-index:2;background:var(--surface)}
+.libro-tbl th:first-child{z-index:3;background:var(--navy)}
+.lc-paid{background:#eaf3de;color:var(--ok);font-weight:500}
+.lc-late{background:var(--bad-bg);color:var(--bad);font-weight:500}
+.lc-pend{background:var(--warn-bg);color:var(--warn);font-weight:500}
+.lc-adv{background:var(--inf-bg);color:var(--inf);font-weight:500}
+.lc-ex{background:var(--surface2);color:var(--text3);font-size:11px}
+.lc-part-p{color:var(--ok);font-size:11px}
+.lc-part-r{color:var(--bad);font-size:11px}
+.libro-tot-row td{background:var(--surface2);font-weight:600;font-size:12px}
+.libro-saldo-row td{background:var(--navy);color:#fff;font-weight:700;font-size:13px;text-align:center}
+/* ── CUMPLEAÑOS ── */
+.cumple-card{background:linear-gradient(135deg,var(--navy) 0%,#2d4070 60%,#1a3050 100%);border:2px solid var(--gold);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1rem;color:#fff;position:relative;overflow:hidden}
+.cumple-card::before{content:'';position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:rgba(212,168,67,.08);border-radius:50%}
+.cumple-card::after{content:'';position:absolute;bottom:-30px;right:20px;width:80px;height:80px;background:rgba(212,168,67,.05);border-radius:50%}
+.cumple-title{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.cumple-name{font-size:16px;font-weight:700;margin-bottom:3px}
+.cumple-sub{font-size:12px;color:rgba(255,255,255,.7);margin-bottom:12px}
+.cumple-btns{display:flex;gap:8px;flex-wrap:wrap}
+.cumple-btn{padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.cumple-btn-p{background:var(--gold);color:#fff}
+.cumple-btn-p:hover{background:#c49530}
+.cumple-btn-g{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.cumple-btn-g:hover{background:rgba(255,255,255,.2)}
+/* ── MODAL PREVIEW WA ── */
+.wa-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem}
+.wa-modal{background:var(--surface);border-radius:var(--radius);width:100%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.wa-modal-hdr{background:var(--navy);color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.wa-modal-hdr span{font-size:14px;font-weight:600}
+.wa-modal-close{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;line-height:1;padding:0 2px}
+.wa-modal-close:hover{color:#fff}
+.wa-modal-body{padding:16px 18px}
+.wa-variants{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.wa-var-btn{padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:inherit}
+.wa-var-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.wa-msg-area{width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;resize:vertical;background:var(--surface);color:var(--text);min-height:160px}
+.wa-msg-area:focus{outline:none;border-color:var(--navy)}
+.wa-modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
 </style>
 </head>
 <body>
@@ -130,7 +193,7 @@ tr:hover td{background:var(--surface2)}
 <div id="login-screen" class="login-screen">
   <div class="login-box">
     <img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo" class="login-logo">
-    <div class="login-title">Logia Lucero del Alba</div>
+    <div class="login-title">Tesorería Masónica</div>
     <div class="login-sub">Tesorería — Inicia sesión con tu cuenta</div>
     <input type="email" class="login-input" id="login-email" placeholder="Correo electrónico" onkeydown="if(event.key==='Enter')doLogin()">
     <input type="password" class="login-input" id="login-pw" placeholder="Contraseña" maxlength="50" onkeydown="if(event.key==='Enter')doLogin()">
@@ -161,7 +224,7 @@ tr:hover td{background:var(--surface2)}
     <img id="logia-logo" src="" alt="Logo Logia" style="width:50px;height:50px;border-radius:50%;object-fit:cover">
   </div>
   <div>
-    <div id="logia-title" style="font-size:17px;font-weight:600;color:#fff">Logia Lucero del Alba — Tesorería</div>
+    <div id="logia-title" style="font-size:17px;font-weight:600;color:#fff">Tesorería</div>
     <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Control de pagos, gastos y estados de cuenta · v2.0</div>
   </div>
   <div class="hdr-r">
@@ -200,12 +263,37 @@ tr:hover td{background:var(--surface2)}
   <button class="nb" onclick="showView('historial',this)">Historial</button>
   <button class="nb" onclick="showView('estado',this)">Estado de cuenta</button>
   <button class="nb" onclick="showView('reportes',this)">Reportes</button>
+  <button class="nb" id="cobros-nav" style="display:none" onclick="showView('cobros',this)">Cobros</button>
+  <button class="nb" onclick="showView('asistencia',this)">Asistencia</button>
   <button class="nb" id="admin-nav" style="display:none" onclick="showView('admin',this)">Admin</button>
+</div>
+
+<!-- MODAL PREVIEW WHATSAPP -->
+<div id="wa-modal" class="wa-modal-ov" style="display:none" onclick="if(event.target===this)closeWaModal()">
+  <div class="wa-modal">
+    <div class="wa-modal-hdr">
+      <span id="wa-modal-title">Vista previa del mensaje</span>
+      <button class="wa-modal-close" onclick="closeWaModal()">✕</button>
+    </div>
+    <div class="wa-modal-body">
+      <div class="wa-variants">
+        <button class="wa-var-btn active" onclick="setWaVariant(0,this)">Variante 1</button>
+        <button class="wa-var-btn" onclick="setWaVariant(1,this)">Variante 2</button>
+        <button class="wa-var-btn" onclick="setWaVariant(2,this)">Variante 3</button>
+      </div>
+      <textarea class="wa-msg-area" id="wa-msg-area" rows="7"></textarea>
+    </div>
+    <div class="wa-modal-foot">
+      <button class="btn bs" onclick="closeWaModal()">Cancelar</button>
+      <button class="btn bp" id="wa-send-btn" onclick="sendWaMsg()">Abrir en WhatsApp ↗</button>
+    </div>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
 <div id="view-dashboard" class="view active">
   <div class="metrics" id="dash-metrics"></div>
+  <div id="dash-cumple"></div>
   <div id="dash-alerts"></div>
   <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem">
     <button class="btn bs bsm" onclick="exportResumen()">📋 Copiar resumen para directiva</button>
@@ -219,7 +307,14 @@ tr:hover td{background:var(--surface2)}
 <!-- HERMANOS -->
 <div id="view-miembros" class="view">
   <div class="fb">
-    <input class="si" type="text" placeholder="Buscar hermano..." oninput="filterM(this.value)" style="width:220px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input class="si" type="text" placeholder="Buscar hermano..." oninput="filterM(this.value)" style="width:200px">
+      <select class="si" id="m-filtro-activo" onchange="renderM()">
+        <option value="activos">Solo activos</option>
+        <option value="todos">Todos</option>
+        <option value="inactivos">Solo inactivos</option>
+      </select>
+    </div>
     <button class="btn bp" onclick="openMF()">+ Nuevo hermano</button>
   </div>
   <div class="card" id="mf" style="display:none;margin-bottom:1rem">
@@ -228,8 +323,16 @@ tr:hover td{background:var(--surface2)}
       <div class="fg"><label>Nombre completo</label><input type="text" id="mf-name"></div>
       <div class="fg"><label>Grado</label><select id="mf-grado"><option>Aprendiz</option><option>Compañero</option><option selected>Maestro</option></select></div>
       <div class="fg"><label>Cargo</label><input type="text" id="mf-cargo"></div>
-      <div class="fg"><label>Mes de ingreso (YYYY-MM)</label><input type="month" id="mf-ingreso"></div>
+      <div class="fg"><label>Mes de ingreso</label><input type="month" id="mf-ingreso"></div>
       <div class="fg"><label>Email</label><input type="email" id="mf-email"></div>
+      <div class="fg"><label>Celular</label><input type="tel" id="mf-celular" placeholder="+56 9 ..."></div>
+      <div class="fg"><label>Fecha de nacimiento</label><input type="date" id="mf-nacimiento"></div>
+      <div class="fg" style="justify-content:flex-end;padding-top:18px">
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="mf-activo" checked><span class="toggle-sl"></span></label>
+          <span id="mf-activo-label">Hermano activo</span>
+        </div>
+      </div>
     </div>
     <div style="display:flex;gap:8px"><button class="btn bp" onclick="saveM()">Guardar</button><button class="btn bs" onclick="document.getElementById('mf').style.display='none'">Cancelar</button></div>
     <input type="hidden" id="mf-id">
@@ -245,7 +348,7 @@ tr:hover td{background:var(--surface2)}
     <div style="display:flex;gap:8px"><button class="btn bp" onclick="saveEx()">Guardar</button><button class="btn bs" onclick="document.getElementById('exf').style.display='none'">Cancelar</button></div>
     <input type="hidden" id="ex-mid">
   </div>
-  <div class="card"><table><thead><tr><th></th><th>Nombre</th><th>Grado</th><th>Cargo</th><th>Ingreso</th><th>Estado mes actual</th><th>Crédito acum.</th><th>Acciones</th></tr></thead><tbody id="m-tbody"></tbody></table></div>
+  <div class="card"><table><thead><tr><th></th><th>Nombre</th><th>Grado</th><th>Cargo</th><th>Ingreso</th><th>Estado</th><th>Activo</th><th>Crédito acum.</th><th>Acciones</th></tr></thead><tbody id="m-tbody"></tbody></table></div>
 </div>
 
 <!-- CUOTAS -->
@@ -415,6 +518,8 @@ tr:hover td{background:var(--surface2)}
     <button class="tab" onclick="showTab('rt-hno',this)">Por hermano</button>
     <button class="tab" onclick="showTab('rt-gas',this)">Gastos</button>
     <button class="tab" onclick="showTab('rt-exc',this)">Exenciones</button>
+    <button class="tab" onclick="showTab('rt-libro',this);renderLibro()">Libro cuotas</button>
+    <button class="tab" onclick="showTab('rt-nomina',this);renderNomina()">Nómina</button>
   </div>
   <div id="rt-tes">
     <div class="metrics" id="rep-metrics"></div>
@@ -436,6 +541,49 @@ tr:hover td{background:var(--surface2)}
   <div id="rt-exc" style="display:none">
     <div class="card"><div class="ct">Exenciones</div><table><thead><tr><th>Hermano</th><th>Desde</th><th>Hasta</th><th>Motivo</th><th>Estado</th><th></th></tr></thead><tbody id="re-tbody"></tbody></table></div>
   </div>
+  <div id="rt-nomina" style="display:none">
+    <div class="card">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+        <select class="si" id="nom-filtro">
+          <option value="activos">Solo activos</option>
+          <option value="todos">Todos</option>
+          <option value="inactivos">Solo inactivos</option>
+        </select>
+        <label style="font-size:12px;color:var(--text2)">Columnas:</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-grado" checked onchange="renderNomina()"> Grado</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-cargo" checked onchange="renderNomina()"> Cargo</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-ingreso" checked onchange="renderNomina()"> Iniciación</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-email" onchange="renderNomina()"> Email</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-celular" onchange="renderNomina()"> Celular</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-nacimiento" onchange="renderNomina()"> Nacimiento</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-activo" onchange="renderNomina()"> Estado</label>
+        <label style="font-size:12px"><input type="checkbox" id="nom-col-asist" onchange="renderNomina()"> Asistencia %</label>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+        <button class="btn bp bsm" onclick="renderNomina()">Actualizar</button>
+        <button class="btn bs bsm" onclick="exportNominaExcel()">Exportar Excel</button>
+        <button class="btn bs bsm" onclick="printNomina()">Imprimir / PDF</button>
+        <button class="btn bs bsm" onclick="printListaFirma()">Lista de firma (asistencia)</button>
+      </div>
+      <div id="nom-content"></div>
+    </div>
+  </div>
+  <div id="rt-libro" style="display:none">
+    <div class="card">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+        <div class="fg" style="flex-direction:row;align-items:center;gap:6px">
+          <label style="font-size:12px;white-space:nowrap">Desde</label>
+          <input type="month" class="si" id="libro-desde" onchange="renderLibro()">
+        </div>
+        <div class="fg" style="flex-direction:row;align-items:center;gap:6px">
+          <label style="font-size:12px;white-space:nowrap">Hasta</label>
+          <input type="month" class="si" id="libro-hasta" onchange="renderLibro()">
+        </div>
+        <button class="btn bs bsm" onclick="printLibro()">Imprimir / PDF</button>
+      </div>
+      <div class="libro-wrap" id="libro-content"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ADMIN -->
@@ -450,6 +598,14 @@ tr:hover td{background:var(--surface2)}
       <button class="btn bp" onclick="createLogia()">Crear Logia</button>
     </div>
     <div class="card"><div class="ct">Logias existentes</div><div id="logias-list"></div></div>
+    <div class="card" style="margin-top:1rem">
+      <div class="ct">Enlace de grupo WhatsApp</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Este enlace se usará al enviar mensajes de cumpleaños al grupo. Pégalo desde WhatsApp → Grupo → Invitar por enlace.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input type="url" class="si" id="wa-grupo-link" placeholder="https://chat.whatsapp.com/..." style="flex:1;min-width:240px" value="">
+        <button class="btn bp" onclick="saveWhatsappGrupo()">Guardar enlace</button>
+      </div>
+    </div>
     <div class="card" style="margin-top:1rem">
       <div class="ct">Subir logo de logia</div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px">
@@ -484,6 +640,73 @@ tr:hover td{background:var(--surface2)}
     <div class="card" style="margin-top:1rem"><div class="ct">Usuarios registrados</div><div id="users-list">Cargando...</div></div>
   </div>
 </div>
+<div id="view-cobros" class="view">
+  <div class="fb"><span style="font-size:13px;color:var(--text2)">Cargos y devoluciones especiales</span><button class="btn bp" onclick="openCE()">+ Nuevo cobro</button></div>
+  <div class="card" id="ce-form" style="display:none;margin-bottom:1rem">
+    <div class="ct" id="ce-form-title">Nuevo cobro especial</div>
+    <div class="fgrid" style="margin-top:8px">
+      <div class="fg"><label>Nombre / Concepto</label><input type="text" id="ce-nombre" class="si" placeholder="Ej: Ágape, Derecho de iniciación, Ajuste..."></div>
+      <div class="fg"><label>Fecha del cobro</label><input type="date" id="ce-fecha" class="si"></div>
+      <div class="fg"><label>Monto en $ (negativo = devolución)</label><input type="number" id="ce-monto" class="si" placeholder="8000"></div>
+    </div>
+    <div style="margin-top:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:block">Asignar a hermanos:</label>
+      <div style="margin-bottom:8px;display:flex;gap:8px">
+        <button type="button" class="btn bs bsm" onclick="toggleAllCE(true)">Seleccionar todos</button>
+        <button type="button" class="btn bs bsm" onclick="toggleAllCE(false)">Ninguno</button>
+      </div>
+      <div id="ce-members" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:10px;background:var(--surface2)"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn bp" onclick="saveCE()">Guardar cobro</button>
+      <button class="btn bs" onclick="closeCE()">Cancelar</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Historial de cobros especiales</div>
+    <div id="cobros-list"><div class="empty">No hay cobros especiales registrados.</div></div>
+  </div>
+</div>
+
+<!-- ASISTENCIA -->
+<div id="view-asistencia" class="view">
+  <div class="tabs">
+    <button class="tab active" onclick="showAsistTab('ast-tenidas',this)">Tenidas</button>
+    <button class="tab" onclick="showAsistTab('ast-registro',this);renderAsistRegistro()">Registro</button>
+    <button class="tab" onclick="showAsistTab('ast-resumen',this);renderAsistResumen()">Resumen</button>
+  </div>
+  <!-- Tenidas -->
+  <div id="ast-tenidas">
+    <div class="card" style="margin-bottom:1rem">
+      <div class="ct">Nueva tenida</div>
+      <div class="fgrid" style="margin-bottom:1rem">
+        <div class="fg"><label>Fecha</label><input type="date" id="ast-fecha"></div>
+        <div class="fg"><label>Título / descripción</label><input type="text" id="ast-titulo" placeholder="Ej: Tenida ordinaria mayo 2026"></div>
+      </div>
+      <button class="btn bp" onclick="saveTenida()">Agregar tenida</button>
+    </div>
+    <div class="card"><div class="ct">Tenidas registradas</div><div id="ast-tenidas-list"></div></div>
+  </div>
+  <!-- Registro de asistencia -->
+  <div id="ast-registro" style="display:none">
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+        <span style="font-size:13px;color:var(--text2)">Marca ✓ en cada celda donde el hermano asistió</span>
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="ast-incl-inactivos" onchange="renderAsistRegistro()">
+          Incluir inactivos
+        </label>
+        <button class="btn bs bsm" onclick="printAsistencia()">Imprimir lista de firma</button>
+      </div>
+      <div style="overflow-x:auto"><table class="asist-tbl" id="ast-tabla"></table></div>
+    </div>
+  </div>
+  <!-- Resumen -->
+  <div id="ast-resumen" style="display:none">
+    <div class="card"><div class="ct">Resumen de asistencia por hermano</div><div id="ast-resumen-content"></div></div>
+  </div>
+</div>
+
 <div id="edit-mov-modal" onclick="if(event.target===this)closeMovEdit()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center">
   <div style="background:var(--surface);border-radius:var(--radius);padding:1.5rem;max-width:480px;width:90%;max-height:90vh;overflow-y:auto">
     <div class="ct" id="em-title">Editar movimiento</div>
@@ -519,6 +742,8 @@ let userLogias = [];
 let selectedLogia = null;
 let isAdmin = false;
 let logoUrl = 'https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png';
+let logiaDisplayName = 'Tesorería';
+let whatsappGrupo = '';
 let remoteListener = null;
 let syncTimer = null;
 
@@ -542,12 +767,14 @@ function initFirebase(){
       isAdmin = user.email === 'cguzman@propertyplus.cl';
       if(isAdmin){
         document.getElementById('admin-nav').style.display='inline-flex';
+        document.getElementById('cobros-nav').style.display='inline-flex';
         document.getElementById('logia-selector').style.display='none';
         document.getElementById('main-app').style.display='block';
         await loadAdminLogias();
       } else {
         document.getElementById('admin-nav').style.display='none';
         document.getElementById('admin-logia-switch').style.display='none';
+        document.getElementById('cobros-nav').style.display=(role==='editor')?'inline-flex':'none';
         userLogias = claimLogias || ['logia_lucero_del_alba'];
         if(userLogias.length === 1){
           selectedLogia = userLogias[0];
@@ -606,6 +833,7 @@ async function loadAdminLogias(){
 }
 function adminSwitchLogia(logia){
   if(!logia) return;
+  clearTimeout(syncTimer);syncTimer=null;
   selectedLogia = logia;
   if(remoteListener){remoteListener();remoteListener=null;}
   loadRemoteData(true);
@@ -655,7 +883,7 @@ function doSignOut(){
 }
 async function loadRemoteData(forceRemote=false){
   if(forceRemote){
-    members=[];fees=[];exemptions=[];payments=[];gastos=[];misc=[];credits={};updatedAt='';
+    members=[];fees=[];exemptions=[];payments=[];gastos=[];misc=[];credits={};cobrosEspeciales=[];updatedAt='';
   } else {
     loadLocal();
   }
@@ -665,11 +893,14 @@ async function loadRemoteData(forceRemote=false){
     const snap=await docRef.get();
     if(snap.exists){
       const remoteData=snap.data();
-      if(forceRemote||shouldUseRemote(remoteData)){applyAppData(remoteData);saveLocal();renderAll();}
+      if(forceRemote||shouldUseRemote(remoteData)){applyAppData(remoteData);await loadAttachments();saveLocal();renderAll();}
+      else{await loadAttachments();}
       logoUrl = remoteData.logo || 'https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png';
       document.getElementById('logia-logo').src = logoUrl;
-      const logiaName = remoteData.name || selectedLogia.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-      document.getElementById('logia-title').textContent = logiaName + ' — Tesorería';
+      logiaDisplayName = remoteData.name || selectedLogia.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      document.getElementById('logia-title').textContent = logiaDisplayName + ' — Tesorería';
+      document.title = logiaDisplayName + ' — Tesorería';
+      whatsappGrupo = remoteData.whatsappGrupo || '';
     } else if(!forceRemote&&updatedAt){
       await saveToFirestore();
     }
@@ -677,7 +908,7 @@ async function loadRemoteData(forceRemote=false){
       remoteListener=docRef.onSnapshot(snapshot=>{
         if(snapshot.exists){
           const data=snapshot.data();
-          if(shouldUseRemote(data)){applyAppData(data);saveLocal();renderAll();}
+          if(shouldUseRemote(data)){applyAppData(data);mergeFilesIntoData();saveLocal();renderAll();}
         }
       },err=>{console.warn('Firestore listener error',err);});
     }
@@ -688,6 +919,20 @@ function shouldUseRemote(remote){
   if(!updatedAt) return true;
   return new Date(remote.updatedAt) > new Date(updatedAt);
 }
+function stripFiles(arr){return(arr||[]).map(r=>{if(!r.file)return r;const{file,...rest}=r;return rest;});}
+function mergeFilesIntoData(){
+  payments.forEach(p=>{const k='payments_'+p.id;if(fileCache[k])p.file=fileCache[k];});
+  gastos.forEach(g=>{const k='gastos_'+g.id;if(fileCache[k])g.file=fileCache[k];});
+  misc.forEach(m=>{const k='misc_'+m.id;if(fileCache[k])m.file=fileCache[k];});
+}
+async function loadAttachments(){
+  try{
+    const snap=await firebase.firestore().collection(`apps/${selectedLogia}/attachments`).get();
+    fileCache={};
+    snap.forEach(doc=>{fileCache[doc.id]=doc.data().file;});
+    mergeFilesIntoData();
+  }catch(e){console.warn('loadAttachments error',e);}
+}
 async function saveToFirestore(){
   saveLocal();
   const user=firebase.auth().currentUser;
@@ -695,11 +940,30 @@ async function saveToFirestore(){
   setSS('Guardando en la nube...','');
   try{
     const now=new Date().toISOString();
-    await firebase.firestore().doc(`apps/${selectedLogia}`).set({
-      ...getAppData(),
+    const db=firebase.firestore();
+    const appRef=db.doc(`apps/${selectedLogia}`);
+    const data=getAppData();
+    // Guardar datos principales SIN archivos adjuntos
+    await appRef.set({
+      ...data,
+      payments:stripFiles(data.payments),
+      gastos:stripFiles(data.gastos),
+      misc:stripFiles(data.misc),
       updatedAt:now,
       lastModifiedBy:user.email
     });
+    // Guardar archivos adjuntos en subcolección separada
+    const batch=db.batch();
+    const attRef=appRef.collection('attachments');
+    [...(data.payments||[]),...(data.gastos||[]),...(data.misc||[])].forEach(r=>{
+      if(r.file&&r.file.length>100){
+        const tipo=data.payments.includes(r)?'payments':data.gastos.includes(r)?'gastos':'misc';
+        const k=tipo+'_'+r.id;
+        batch.set(attRef.doc(k),{file:r.file,tipo,recordId:r.id});
+        fileCache[k]=r.file;
+      }
+    });
+    await batch.commit();
     updatedAt=now;
     setSS(`Guardado: ${user.email}`,'ok');
   }catch(e){console.error(e);setSS('Error al guardar','err');}
@@ -794,22 +1058,27 @@ const TL={capita:'Cápita',derecho:'Derecho',extraordinaria:'Extraordinaria',mul
 
 // credits[memberId] = monto acumulado no imputado a ningún mes completo
 let members=[],fees=[],exemptions=[],payments=[],gastos=[],misc=[],credits={};
-let nid=1,nmid=1,nexid=1,nfid=1,ngid=1,niid=1;
+let fileCache={}; // archivos adjuntos en memoria: {'payments_1': 'data:...', ...}
+let cobrosEspeciales=[];
+let nid=1,nmid=1,nexid=1,nfid=1,ngid=1,niid=1,nceid=1;
 let updatedAt='';
 
-function getAppData(){return{members,fees,exemptions,payments,gastos,misc,credits,nid,nmid,nexid,nfid,ngid,niid,updatedAt,lastModifiedBy:(typeof firebase!=='undefined'&&firebase.auth&&firebase.auth().currentUser?firebase.auth().currentUser.email:''),v:4};}
+function getAppData(){return{members,fees,exemptions,payments,gastos,misc,credits,cobrosEspeciales,tenidas,asistencias,nid,nmid,nexid,nfid,ngid,niid,nceid,ntid,updatedAt,lastModifiedBy:(typeof firebase!=='undefined'&&firebase.auth&&firebase.auth().currentUser?firebase.auth().currentUser.email:''),v:4};}
 function applyAppData(d){
   if(!d)return;
   members=d.members||[];fees=d.fees||[];exemptions=d.exemptions||[];
   payments=d.payments||[];gastos=d.gastos||[];misc=d.misc||[];
-  credits=d.credits||{};
+  credits=d.credits||{};cobrosEspeciales=d.cobrosEspeciales||[];
+  tenidas=d.tenidas||[];asistencias=d.asistencias||[];
   nid=d.nid||1;nmid=d.nmid||1;nexid=d.nexid||1;
   nfid=d.nfid||1;ngid=d.ngid||1;niid=d.niid||1;
+  nceid=d.nceid||(cobrosEspeciales.length?Math.max(...cobrosEspeciales.map(c=>c.id))+1:1);
+  ntid=d.ntid||(tenidas.length?Math.max(...tenidas.map(t=>t.id))+1:1);
   updatedAt=d.updatedAt||updatedAt;
 }
 function localKey(){return 'lda_v4_'+(selectedLogia||'default');}
 function saveLocal(){try{localStorage.setItem(localKey(),JSON.stringify(getAppData()));}catch(e){}}
-function loadLocal(){try{const d=localStorage.getItem(localKey())||localStorage.getItem('lda_v4');if(d)applyAppData(JSON.parse(d));}catch(e){}}
+function loadLocal(){try{const d=localStorage.getItem(localKey());if(d)applyAppData(JSON.parse(d));}catch(e){}}
 
 // ── HELPERS ──────────────────────────────────────────────────
 function fm(n){return'$'+Math.round(n).toLocaleString('es-CL')}
@@ -891,6 +1160,9 @@ function getSaldoAnterior(from){
 // ── LÓGICA DE CUOTAS Y CRÉDITOS ──────────────────────────────
 function getFee(m){const s=fees.slice().sort((a,b)=>b.from.localeCompare(a.from));const f=s.find(x=>x.from<=m);return f?f.monto:0}
 function isEx(mid,m){return exemptions.some(e=>e.memberId===mid&&e.from<=m&&e.to>=m)}
+function getCobrosForMember(mid,m){return cobrosEspeciales.filter(c=>c.memberIds.includes(mid)&&c.fecha.slice(0,7)===m);}
+function getTotalCobros(mid,m){return getCobrosForMember(mid,m).reduce((s,c)=>s+c.monto,0);}
+function getTotalDue(mid,m){const base=isEx(mid,m)?0:getFee(m);return base+getTotalCobros(mid,m);}
 
 // Devuelve meses completamente pagados para un miembro
 function paidMeses(mid){
@@ -912,7 +1184,7 @@ function getCredit(mid){return credits[mid]||0;}
 function mStatus(mid,m){
   const mb=members.find(x=>x.id===mid);
   if(!mb||mb.ingreso>m)return'na';
-  if(isEx(mid,m))return'exempt';
+  if(isEx(mid,m)&&getTotalCobros(mid,m)===0)return'exempt';
   const paid=paidMeses(mid);
   if(paid.has(m))return'paid';
   const partial=partialMeses(mid);
@@ -922,8 +1194,7 @@ function mStatus(mid,m){
   return'pending';
 }
 function mDeuda(mid,m){
-  // Cuánto se debe en un mes (descontando abono parcial)
-  const cuota=getFee(m);
+  const cuota=getTotalDue(mid,m);
   const partial=partialMeses(mid);
   return cuota-(partial[m]||0);
 }
@@ -940,13 +1211,14 @@ function computeImp(mid,monto,fecha){
   // Meses pendientes (completos o parciales) desde ingreso
   let pend=[];let c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
   while(c<=fut){
-    if(!paid.has(c)&&!isEx(mid,c)&&c>=mb.ingreso)pend.push(c);
+    const due=getTotalDue(mid,c);
+    if(!paid.has(c)&&due>0&&c>=mb.ingreso)pend.push(c);
     c=ma(c,1);
   }
   let imputado=[];let parcial=null;let creditoNuevo=0;
   for(let i=0;i<pend.length;i++){
     const mes=pend[i];
-    const cuota=getFee(mes);if(cuota===0)continue;
+    const cuota=getTotalDue(mid,mes);if(cuota===0)continue;
     const yaAbonado=partial[mes]||0;
     const falta=cuota-yaAbonado;
     if(saldo>=falta){saldo-=falta;imputado.push(mes);}
@@ -962,33 +1234,41 @@ function renderDash(){
   buildPeriodSelects();
   const{from,to}=getPeriod();
   const meses=getMesesInRange(from,to);
-  const activos=members.filter(x=>x.ingreso<=to);
+  const activos=sortMiembros(members.filter(x=>x.ingreso<=to&&isActivo(x)));
   const cm_=cm();
 
-  // Contar estados en el período
+  // Contar estados: moroso si tiene algún mes anterior sin pagar
   let alDia=0,morosos=0,exentos=0,parciales=0;
   activos.forEach(mb=>{
-    const s=mStatus(mb.id,cm_);
-    if(s==='paid'||s==='exempt')alDia++;
-    if(s==='late')morosos++;
-    if(s==='exempt')exentos++;
-    if(s==='partial')parciales++;
+    const paid=paidMeses(mb.id);
+    let hasMorosa=false;
+    let c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
+    while(c<cm_){
+      if(!paid.has(c)&&!isEx(mb.id,c)){hasMorosa=true;break;}
+      c=ma(c,1);
+    }
+    if(hasMorosa){morosos++;}
+    else{
+      const s=mStatus(mb.id,cm_);
+      if(s==='paid'||s==='exempt'||s==='pending')alDia++;
+      if(s==='partial')parciales++;
+      if(s==='exempt')exentos++;
+    }
   });
 
   const ingPer=payments.filter(p=>p.fecha.slice(0,7)>=from&&p.fecha.slice(0,7)<=to).reduce((a,p)=>a+p.monto,0)
     +misc.filter(p=>p.fecha.slice(0,7)>=from&&p.fecha.slice(0,7)<=to).reduce((a,p)=>a+p.monto,0);
   const gasPer=gastos.filter(g=>g.fecha.slice(0,7)>=from&&g.fecha.slice(0,7)<=to).reduce((a,g)=>a+g.monto,0);
 
-  // Deuda total acumulada (sin límite de período)
-  let deudaTotal=0;
+  // Deuda morosa (meses anteriores impagos) y pendiente (mes actual impago)
+  let deudaMorosa=0,deudaPendiente=0;
   members.forEach(mb=>{
     const paid=paidMeses(mb.id);
-    const partial=partialMeses(mb.id);
     let c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
     while(c<=cm_){
       if(!paid.has(c)&&!isEx(mb.id,c)&&c>=mb.ingreso){
-        const[y,mo]=c.split('-').map(Number);
-        if(new Date()>=new Date(y,mo-1,6))deudaTotal+=mDeuda(mb.id,c);
+        if(c<cm_) deudaMorosa+=mDeuda(mb.id,c);
+        else deudaPendiente+=mDeuda(mb.id,c);
       }
       c=ma(c,1);
     }
@@ -1006,23 +1286,27 @@ function renderDash(){
     <div class="met"><div class="met-l">Gastos período</div><div class="met-v bad">${fm(gasPer)}</div></div>
     <div class="met"><div class="met-l">Neto período</div><div class="met-v ${ingPer-gasPer>=0?'ok':'bad'}">${fm(ingPer-gasPer)}</div></div>
     <div class="met" style="border:2px solid var(--navy)" title="Saldo anterior + neto del período"><div class="met-l">Saldo final acumulado</div><div class="met-v ${saldoFinal>=0?'ok':'bad'}">${fm(saldoFinal)}</div></div>
-    <div class="met"><div class="met-l">Deuda total acumulada</div><div class="met-v bad">${fm(deudaTotal)}</div></div>
+    <div class="met"><div class="met-l">Deuda morosa</div><div class="met-v bad">${fm(deudaMorosa)}</div></div>
+    <div class="met"><div class="met-l">Cuota pendiente (mes actual)</div><div class="met-v warn">${fm(deudaPendiente)}</div></div>
   `;
 
-  document.getElementById('dash-alerts').innerHTML=morosos>0?`<div class="alert-b">Hay ${morosos} hermano(s) moroso(s) · Deuda acumulada total: ${fm(deudaTotal)}</div>`:'';
+  document.getElementById('dash-alerts').innerHTML=morosos>0?`<div class="alert-b">Hay ${morosos} hermano(s) moroso(s) · Morosa: ${fm(deudaMorosa)} · Pendiente mes actual: ${fm(deudaPendiente)}</div>`:'';
+
+  // Tarjeta de cumpleaños
+  renderCumpleCard();
 
   // Lista deudores
   const deudores=activos.filter(mb=>{
-    const s=mStatus(mb.id,cm_);return s==='late'||s==='partial';
+    const paid=paidMeses(mb.id);
+    let c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
+    while(c<cm_){if(!paid.has(c)&&!isEx(mb.id,c))return true;c=ma(c,1);}
+    return mStatus(mb.id,cm_)==='partial';
   });
   document.getElementById('dash-morosos').innerHTML=deudores.length?deudores.map(mb=>{
     const paid=paidMeses(mb.id);const partial=partialMeses(mb.id);
     let deuda=0;let mesesD=0;let c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
     while(c<=cm_){
-      if(!paid.has(c)&&!isEx(mb.id,c)&&c>=mb.ingreso){
-        const[y,mo]=c.split('-').map(Number);
-        if(new Date()>=new Date(y,mo-1,6)){deuda+=mDeuda(mb.id,c);mesesD++;}
-      }
+      if(!paid.has(c)&&!isEx(mb.id,c)&&c>=mb.ingreso){deuda+=mDeuda(mb.id,c);mesesD++;}
       c=ma(c,1);
     }
     const s=mStatus(mb.id,cm_);
@@ -1042,25 +1326,48 @@ let mFilter='';
 function renderM(f){
   if(f!==undefined)mFilter=f;
   const m=cm();
-  const list=mFilter?members.filter(x=>x.name.toLowerCase().includes(mFilter.toLowerCase())):members;
+  const filtroActivo=document.getElementById('m-filtro-activo')?.value||'activos';
+  let list=members;
+  if(filtroActivo==='activos')list=list.filter(isActivo);
+  else if(filtroActivo==='inactivos')list=list.filter(mb=>!isActivo(mb));
+  if(mFilter)list=list.filter(x=>x.name.toLowerCase().includes(mFilter.toLowerCase()));
+  list=sortMiembros(list);
   document.getElementById('m-tbody').innerHTML=list.map(mb=>{
-    const s=mStatus(mb.id,m);
+    const activo=isActivo(mb);
+    const s=activo?mStatus(mb.id,m):'na';
     const cr=getCredit(mb.id);
-    const b=s==='paid'?'<span class="badge b-ok">Al día</span>':s==='late'?'<span class="badge b-bad">Moroso</span>':s==='exempt'?'<span class="badge b-inf">Exento</span>':s==='partial'?'<span class="badge b-pur">Parcial</span>':s==='pending'?'<span class="badge b-warn">Pendiente</span>':'<span class="badge b-gray">N/A</span>';
-    return`<tr><td><div class="ini">${ini(mb.name)}</div></td><td style="font-weight:600">${mb.name}</td><td>${mb.grado}</td><td style="color:var(--text2)">${mb.cargo||'—'}</td><td>${fmes(mb.ingreso)}</td><td>${b}</td><td style="color:${cr>0?'var(--ok)':'var(--text3)'}${cr>0?';font-weight:600':''}">${cr>0?fm(cr):'—'}</td><td style="white-space:nowrap"><button class="btn bs bsm" style="margin-right:3px" onclick="openMF(${mb.id})">Editar</button><button class="btn bs bsm" style="margin-right:3px" onclick="openExF(${mb.id})">Exención</button><button class="bd" onclick="delM(${mb.id})">×</button></td></tr>`;
-  }).join('')||'<tr><td colspan="8" class="empty">Sin resultados</td></tr>';
+    const b=s==='paid'?'<span class="badge b-ok">Al día</span>':s==='late'?'<span class="badge b-bad">Moroso</span>':s==='exempt'?'<span class="badge b-inf">Exento</span>':s==='partial'?'<span class="badge b-pur">Parcial</span>':s==='pending'?'<span class="badge b-warn">Pendiente</span>':'<span class="badge b-gray">—</span>';
+    const ab=activo?'<span class="badge b-ok">Activo</span>':'<span class="badge b-inact">Inactivo</span>';
+    return`<tr style="${activo?'':'opacity:.6'}"><td><div class="ini">${ini(mb.name)}</div></td><td style="font-weight:600">${mb.name}</td><td>${mb.grado}</td><td style="color:var(--text2)">${mb.cargo||'—'}</td><td>${fmes(mb.ingreso)}</td><td>${b}</td><td>${ab}</td><td style="color:${cr>0?'var(--ok)':'var(--text3)'}${cr>0?';font-weight:600':''}">${cr>0?fm(cr):'—'}</td><td style="white-space:nowrap"><button class="btn bs bsm" style="margin-right:3px" onclick="openMF(${mb.id})">Editar</button><button class="btn bs bsm" style="margin-right:3px" onclick="openExF(${mb.id})">Exención</button><button class="bd" onclick="delM(${mb.id})">×</button></td></tr>`;
+  }).join('')||'<tr><td colspan="9" class="empty">Sin resultados</td></tr>';
 }
 function filterM(v){renderM(v)}
 function openMF(id){
   document.getElementById('mf-id').value=id||'';
-  if(id){const mb=members.find(x=>x.id===id);document.getElementById('mf-name').value=mb.name;document.getElementById('mf-grado').value=mb.grado;document.getElementById('mf-cargo').value=mb.cargo||'';document.getElementById('mf-ingreso').value=mb.ingreso||'';document.getElementById('mf-email').value=mb.email||'';document.getElementById('mf-title').textContent='Editar hermano';}
-  else{['mf-name','mf-cargo','mf-email'].forEach(x=>document.getElementById(x).value='');document.getElementById('mf-ingreso').value=cm();document.getElementById('mf-title').textContent='Nuevo hermano';}
+  const activoChk=document.getElementById('mf-activo');
+  if(id){
+    const mb=members.find(x=>x.id===id);
+    document.getElementById('mf-name').value=mb.name;
+    document.getElementById('mf-grado').value=mb.grado;
+    document.getElementById('mf-cargo').value=mb.cargo||'';
+    document.getElementById('mf-ingreso').value=mb.ingreso||'';
+    document.getElementById('mf-email').value=mb.email||'';
+    document.getElementById('mf-celular').value=mb.celular||'';
+    document.getElementById('mf-nacimiento').value=mb.fechaNacimiento||'';
+    activoChk.checked=mb.activo!==false;
+    document.getElementById('mf-title').textContent='Editar hermano';
+  } else {
+    ['mf-name','mf-cargo','mf-email','mf-celular','mf-nacimiento'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('mf-ingreso').value=cm();
+    activoChk.checked=true;
+    document.getElementById('mf-title').textContent='Nuevo hermano';
+  }
   document.getElementById('mf').style.display='block';
 }
 function saveM(){
   const name=document.getElementById('mf-name').value.trim();if(!name){alert('Ingresa el nombre');return}
   const eid=parseInt(document.getElementById('mf-id').value);
-  const data={name,grado:document.getElementById('mf-grado').value,cargo:document.getElementById('mf-cargo').value,ingreso:document.getElementById('mf-ingreso').value||cm(),email:document.getElementById('mf-email').value};
+  const data={name,grado:document.getElementById('mf-grado').value,cargo:document.getElementById('mf-cargo').value,ingreso:document.getElementById('mf-ingreso').value||cm(),email:document.getElementById('mf-email').value,celular:document.getElementById('mf-celular').value,fechaNacimiento:document.getElementById('mf-nacimiento').value,activo:document.getElementById('mf-activo').checked};
   if(eid)Object.assign(members.find(x=>x.id===eid),data);else members.push({id:nmid++,...data});
   schedSave();document.getElementById('mf').style.display='none';renderM();refreshSel();renderDash();
 }
@@ -1118,7 +1425,7 @@ function previewPago(){
     const{imputado,parcial,creditoNuevo,creditoUsado}=computeImp(mid,monto,fecha);
     let html='<div class="info-b">';
     if(creditoUsado>0)html+=`<div>Crédito aplicado: <strong>${fm(creditoUsado)}</strong></div>`;
-    if(imputado.length>0)html+=`<div>Meses pagados completos: <strong>${imputado.map(x=>fmes(x)+' ('+fm(getFee(x))+')').join(', ')}</strong></div>`;
+    if(imputado.length>0)html+=`<div>Meses pagados completos: <strong>${imputado.map(x=>fmes(x)+' ('+fm(getTotalDue(mid,x))+')').join(', ')}</strong></div>`;
     if(parcial)html+=`<div style="color:var(--pur)">Abono parcial en <strong>${fmes(parcial.mes)}</strong>: se abona ${fm(parcial.monto)} de ${fm(parcial.cuota)} · Saldo pendiente: <strong>${fm(parcial.falta)}</strong></div>`;
     if(creditoNuevo>0)html+=`<div style="color:var(--ok)">Crédito a favor (anticipo): <strong>${fm(creditoNuevo)}</strong></div>`;
     if(imputado.length===0&&!parcial&&creditoNuevo>0)html+='<div>No hay meses pendientes. El monto queda como crédito a favor.</div>';
@@ -1358,10 +1665,13 @@ function renderEC(){
   const paid=paidMeses(mid);const partial=partialMeses(mid);
   let rows=[];
   meses.forEach(m=>{
-    const cuota=getFee(m);const exento=isEx(mid,m);const s=mStatus(mid,m);
+    const totalDue=getTotalDue(mid,m);
+    const exento=isEx(mid,m)&&getTotalCobros(mid,m)===0;
+    const s=mStatus(mid,m);
     const abonado=partial[m]||0;
-    const pagadoMes=paid.has(m)?cuota:(abonado>0?abonado:0);
-    rows.push({mes:m,concepto:'Cápita '+fmes(m),esperado:exento?0:cuota,pagado:pagadoMes,estado:s,tipo:'capita',exento,parcial:s==='partial'?{abonado,falta:cuota-abonado}:null});
+    const pagadoMes=paid.has(m)?totalDue:(abonado>0?abonado:0);
+    const cobrosM=getCobrosForMember(mid,m);
+    rows.push({mes:m,concepto:'Cápita '+fmes(m),esperado:exento?0:totalDue,pagado:pagadoMes,estado:s,tipo:'capita',exento,parcial:s==='partial'?{abonado,falta:totalDue-abonado}:null,cobros:cobrosM});
   });
   payments.filter(p=>p.memberId===mid&&p.tipo!=='capita'&&p.fecha.slice(0,7)>=from&&p.fecha.slice(0,7)<=to).forEach(p=>{
     rows.push({mes:p.fecha.slice(0,7),concepto:TL[p.tipo]+' — '+fmes(p.mes||p.fecha.slice(0,7)),esperado:0,pagado:p.monto,estado:'otro',tipo:p.tipo});
@@ -1379,7 +1689,7 @@ function renderEC(){
         <div style="font-size:16px;font-weight:600;margin-top:4px">${mb.name}</div>
         <div style="font-size:13px;color:var(--text2)">${mb.grado} · ${mb.cargo||''} · Ingreso: ${fmes(mb.ingreso)}</div>
       </div>
-      <div style="text-align:right"><img src="https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png" alt="Logo" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-bottom:4px;display:block;margin-left:auto"><div style="font-size:12px;font-weight:600;color:var(--navy)">Logia Lucero del Alba</div><div style="font-size:11px;color:var(--text3)">Generado: ${td()}</div></div>
+      <div style="text-align:right"><img src="${logoUrl}" alt="Logo" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-bottom:4px;display:block;margin-left:auto"><div style="font-size:12px;font-weight:600;color:var(--navy)">${logiaDisplayName}</div><div style="font-size:11px;color:var(--text3)">Generado: ${td()}</div></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem">
       <div class="met"><div class="met-l">Cápitas esperadas</div><div class="met-v">${fm(totalEsp)}</div></div>
@@ -1388,17 +1698,20 @@ function renderEC(){
       <div class="met"><div class="met-l">Otros pagos</div><div class="met-v">${fm(totalOtros)}</div></div>
       ${cr>0?`<div class="met"><div class="met-l">Crédito a favor</div><div class="met-v ok">${fm(cr)}</div></div>`:''}
     </div>
-    <table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:1rem">
-      <thead><tr style="background:#f0ede5"><th style="padding:9px 10px;border:1px solid var(--border)">Período</th><th style="padding:9px 10px;border:1px solid var(--border)">Concepto</th><th style="padding:9px 10px;border:1px solid var(--border);text-align:right">Esperado</th><th style="padding:9px 10px;border:1px solid var(--border);text-align:right">Pagado</th><th style="padding:9px 10px;border:1px solid var(--border)">Estado</th></tr></thead>
-      <tbody>${rows.map(r=>{
+    ${(()=>{
+      let fnotes=[];let fnIdx=1;
+      const rowsHtml=rows.map(r=>{
         const bs=r.exento?'b-inf':r.estado==='paid'||r.estado==='otro'?'b-ok':r.estado==='partial'?'b-pur':r.estado==='late'?'b-bad':r.estado==='pending'?'b-warn':'b-gray';
         const bl=r.exento?'Exento':r.estado==='paid'||r.estado==='otro'?'Al día':r.estado==='partial'?'Parcial':r.estado==='late'?'Moroso':r.estado==='pending'?'Pendiente':'N/A';
         const parcialNote=r.parcial?`<br><span style="font-size:11px;color:var(--pur)">Abonado: ${fm(r.parcial.abonado)} · Falta: ${fm(r.parcial.falta)}</span>`:'';
-        return`<tr style="background:${r.tipo!=='capita'?'var(--ok-bg)':'inherit'}"><td style="padding:8px 10px;border:1px solid var(--border)">${fmes(r.mes)}</td><td style="padding:8px 10px;border:1px solid var(--border)">${r.concepto}${parcialNote}</td><td style="padding:8px 10px;border:1px solid var(--border);text-align:right">${r.esperado>0?fm(r.esperado):'—'}</td><td style="padding:8px 10px;border:1px solid var(--border);text-align:right;font-weight:600;color:${r.pagado>0?'var(--ok)':'var(--text3)'}">${r.pagado>0?fm(r.pagado):'—'}</td><td style="padding:8px 10px;border:1px solid var(--border)"><span class="badge ${bs}">${bl}</span></td></tr>`;
-      }).join('')}</tbody>
-      <tfoot><tr style="background:#f0ede5;font-weight:600"><td colspan="2" style="padding:9px 10px;border:1px solid var(--border)">Totales</td><td style="padding:9px 10px;border:1px solid var(--border);text-align:right">${fm(totalEsp)}</td><td style="padding:9px 10px;border:1px solid var(--border);text-align:right;color:var(--ok)">${fm(totalPagCap)}</td><td style="border:1px solid var(--border)"></td></tr></tfoot>
-    </table>
-    ${saldo>0?`<div class="alert-b">Deuda pendiente en cápitas: ${fm(saldo)}${cr>0?' · Crédito disponible: '+fm(cr)+' (se aplicará al próximo pago)':''}</div>`:`<div class="succ-b">El hermano está al día con sus cápitas en este período.${cr>0?' Crédito a favor: '+fm(cr)+'':''}</div>`}
+        let fnIndicator='';
+        if(r.cobros&&r.cobros.length){r.cobros.forEach(c=>{fnotes.push({n:fnIdx,c});fnIndicator+=` <sup style="color:var(--navy);font-weight:700">(${fnIdx++})</sup>`;});}
+        return`<tr style="background:${r.tipo!=='capita'?'var(--ok-bg)':'inherit'}"><td style="padding:8px 10px;border:1px solid var(--border)">${fmes(r.mes)}</td><td style="padding:8px 10px;border:1px solid var(--border)">${r.concepto}${fnIndicator}${parcialNote}</td><td style="padding:8px 10px;border:1px solid var(--border);text-align:right">${r.esperado>0?fm(r.esperado):'—'}</td><td style="padding:8px 10px;border:1px solid var(--border);text-align:right;font-weight:600;color:${r.pagado>0?'var(--ok)':'var(--text3)'}">${r.pagado>0?fm(r.pagado):'—'}</td><td style="padding:8px 10px;border:1px solid var(--border)"><span class="badge ${bs}">${bl}</span></td></tr>`;
+      }).join('');
+      const notasHtml=fnotes.length?`<div style="margin-top:6px;padding:8px 12px;background:var(--surface2);border-radius:6px;font-size:12px;color:var(--text2)">`+fnotes.map(f=>`<div><sup style="color:var(--navy);font-weight:700">(${f.n})</sup> <strong>${f.c.nombre}</strong> ${f.c.fecha} — ${fm(f.c.monto)}${f.c.monto<0?' <em>(devolución)</em>':''}</div>`).join('')+`</div>`:'';
+      return`<table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:6px"><thead><tr style="background:#f0ede5"><th style="padding:9px 10px;border:1px solid var(--border)">Período</th><th style="padding:9px 10px;border:1px solid var(--border)">Concepto</th><th style="padding:9px 10px;border:1px solid var(--border);text-align:right">Esperado</th><th style="padding:9px 10px;border:1px solid var(--border);text-align:right">Pagado</th><th style="padding:9px 10px;border:1px solid var(--border)">Estado</th></tr></thead><tbody>${rowsHtml}</tbody><tfoot><tr style="background:#f0ede5;font-weight:600"><td colspan="2" style="padding:9px 10px;border:1px solid var(--border)">Totales</td><td style="padding:9px 10px;border:1px solid var(--border);text-align:right">${fm(totalEsp)}</td><td style="padding:9px 10px;border:1px solid var(--border);text-align:right;color:var(--ok)">${fm(totalPagCap)}</td><td style="border:1px solid var(--border)"></td></tr></tfoot></table>${notasHtml}`;
+    })()}
+    ${saldo>0?`<div class="alert-b" style="margin-top:8px">Deuda pendiente: ${fm(saldo)}${cr>0?' · Crédito disponible: '+fm(cr)+' (se aplicará al próximo pago)':''}</div>`:`<div class="succ-b" style="margin-top:8px">El hermano está al día en este período.${cr>0?' Crédito a favor: '+fm(cr)+'':''}</div>`}
     ${exemptions.filter(e=>e.memberId===mid&&e.from<=to&&e.to>=from).map(e=>`<div class="info-b">Exención: ${fmes(e.from)}–${fmes(e.to)} · ${e.motivo}</div>`).join('')}
   </div>`;
 }
@@ -1439,6 +1752,63 @@ function renderRep(){
   document.getElementById('re-tbody').innerHTML=exemptions.slice().sort((a,b)=>b.from.localeCompare(a.from)).map(e=>{const mb=members.find(x=>x.id===e.memberId);const act=e.from<=cm()&&e.to>=cm();return`<tr><td style="font-weight:600">${mb?mb.name:'?'}</td><td>${fmes(e.from)}</td><td>${fmes(e.to)}</td><td>${e.motivo}</td><td><span class="badge ${act?'b-inf':'b-gray'}">${act?'Activa':'Finalizada'}</span></td><td><button class="bd" onclick="delEx(${e.id})">×</button></td></tr>`;}).join('')||'<tr><td colspan="6" class="empty">Sin exenciones</td></tr>';
 }
 function delEx(id){if(!confirm('¿Eliminar exención?'))return;exemptions=exemptions.filter(e=>e.id!==id);schedSave();renderRep();renderM();renderDash();}
+
+// ── COBROS ESPECIALES ─────────────────────────────────────────
+function renderCobros(){
+  const el=document.getElementById('cobros-list');
+  if(!cobrosEspeciales.length){el.innerHTML='<div class="empty">No hay cobros especiales registrados.</div>';return;}
+  const sorted=[...cobrosEspeciales].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  el.innerHTML=`<table><thead><tr><th>Fecha</th><th>Concepto</th><th>Monto</th><th>Hermanos asignados</th><th></th></tr></thead><tbody>${
+    sorted.map(c=>{
+      const mbs=c.memberIds.map(id=>{const m=members.find(x=>x.id===id);return m?m.name:'?';}).join(', ');
+      const neg=c.monto<0;
+      return`<tr>
+        <td>${c.fecha}</td>
+        <td style="font-weight:600">${c.nombre}</td>
+        <td style="font-weight:600;color:${neg?'var(--ok)':'var(--bad)'}">${fm(c.monto)}</td>
+        <td style="font-size:12px;color:var(--text2)">${mbs}</td>
+        <td><button class="bd" onclick="delCE(${c.id})">×</button></td>
+      </tr>`;
+    }).join('')
+  }</tbody></table>`;
+}
+function openCE(){
+  document.getElementById('ce-form').style.display='block';
+  document.getElementById('ce-form-title').textContent='Nuevo cobro especial';
+  document.getElementById('ce-nombre').value='';
+  document.getElementById('ce-fecha').value=cm()+'-01';
+  document.getElementById('ce-monto').value='';
+  const cont=document.getElementById('ce-members');
+  const active=members.filter(m=>!m.baja);
+  cont.innerHTML=active.map(m=>`<label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" class="ce-chk" value="${m.id}" checked> ${m.name}</label>`).join('');
+}
+function closeCE(){document.getElementById('ce-form').style.display='none';}
+function toggleAllCE(val){document.querySelectorAll('.ce-chk').forEach(c=>c.checked=val);}
+function saveCE(){
+  const nombre=document.getElementById('ce-nombre').value.trim();
+  const fecha=document.getElementById('ce-fecha').value;
+  const monto=parseFloat(document.getElementById('ce-monto').value);
+  if(!nombre){alert('Ingresa un nombre/concepto.');return;}
+  if(!fecha){alert('Selecciona una fecha.');return;}
+  if(isNaN(monto)||monto===0){alert('Ingresa un monto válido (puede ser negativo para devolución).');return;}
+  const memberIds=[...document.querySelectorAll('.ce-chk:checked')].map(c=>parseInt(c.value));
+  if(!memberIds.length){alert('Selecciona al menos un hermano.');return;}
+  cobrosEspeciales.push({id:nceid++,nombre,fecha,monto,memberIds});
+  schedSave();
+  closeCE();
+  renderCobros();
+  renderM();
+  renderDash();
+}
+function delCE(id){
+  if(!confirm('¿Eliminar este cobro especial?'))return;
+  cobrosEspeciales=cobrosEspeciales.filter(c=>c.id!==id);
+  schedSave();
+  renderCobros();
+  renderM();
+  renderDash();
+}
+
 function renderRH(){
   const mid=parseInt(document.getElementById('rh-sel').value);
   const cont=document.getElementById('rh-content');
@@ -1461,6 +1831,170 @@ function renderRH(){
 }
 
 // ── NAV ──────────────────────────────────────────────────────
+// ── ORDEN POR GRADO ─────────────────────────────────────────
+const GRADO_ORD={Maestro:0,'Compañero':1,Aprendiz:2};
+function sortMiembros(arr){return[...arr].sort((a,b)=>{const g=(GRADO_ORD[a.grado]??9)-(GRADO_ORD[b.grado]??9);return g||a.name.localeCompare(b.name,'es');});}
+function isActivo(mb){return mb.activo!==false;}
+
+// ── NÓMINA ──────────────────────────────────────────────────
+function getNominaList(){
+  const f=document.getElementById('nom-filtro')?.value||'activos';
+  let list=f==='activos'?members.filter(isActivo):f==='inactivos'?members.filter(m=>!isActivo(m)):members.slice();
+  return sortMiembros(list);
+}
+function getNominaCols(){
+  const c={};
+  ['grado','cargo','ingreso','email','celular','nacimiento','activo','asist'].forEach(k=>{
+    const el=document.getElementById('nom-col-'+k);c[k]=el?el.checked:false;
+  });
+  return c;
+}
+function asistPct(mid){
+  if(!tenidas.length)return null;
+  const n=asistencias.filter(a=>a.memberId===mid).length;
+  return{n,total:tenidas.length,pct:Math.round(n/tenidas.length*100)};
+}
+function renderNomina(){
+  const list=getNominaList();
+  const c=getNominaCols();
+  let cols=['N°','Nombre'];
+  if(c.grado)cols.push('Grado');
+  if(c.cargo)cols.push('Cargo');
+  if(c.ingreso)cols.push('Iniciación');
+  if(c.email)cols.push('Email');
+  if(c.celular)cols.push('Celular');
+  if(c.nacimiento)cols.push('Nacimiento');
+  if(c.activo)cols.push('Estado');
+  if(c.asist&&tenidas.length)cols.push('Asistencia');
+  let html=`<table class="nom-tbl" id="nom-table"><thead><tr>${cols.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  list.forEach((mb,i)=>{
+    const ap=c.asist&&tenidas.length?asistPct(mb.id):null;
+    let cells=[i+1,mb.name];
+    if(c.grado)cells.push(mb.grado||'—');
+    if(c.cargo)cells.push(mb.cargo||'—');
+    if(c.ingreso)cells.push(fmes(mb.ingreso));
+    if(c.email)cells.push(mb.email||'—');
+    if(c.celular)cells.push(mb.celular||'—');
+    if(c.nacimiento)cells.push(mb.fechaNacimiento||'—');
+    if(c.activo)cells.push(isActivo(mb)?'Activo':'Inactivo');
+    if(c.asist&&tenidas.length)cells.push(ap?`${ap.n}/${ap.total} (${ap.pct}%)`:'0/'+tenidas.length+' (0%)');
+    html+=`<tr>${cells.map((v,ci)=>`<td${ci===1?' style="font-weight:500"':''}>${v}</td>`).join('')}</tr>`;
+  });
+  html+=`</tbody></table><div style="font-size:11px;color:var(--text3);margin-top:8px">Total: ${list.length} hermano(s) · Generado: ${td()}</div>`;
+  document.getElementById('nom-content').innerHTML=html;
+}
+function exportNominaExcel(){
+  if(typeof XLSX==='undefined'){alert('Cargando librería, intenta en unos segundos.');return;}
+  const list=getNominaList();const c=getNominaCols();
+  let cols=['N°','Nombre'];
+  if(c.grado)cols.push('Grado');if(c.cargo)cols.push('Cargo');if(c.ingreso)cols.push('Iniciación');
+  if(c.email)cols.push('Email');if(c.celular)cols.push('Celular');if(c.nacimiento)cols.push('Nacimiento');
+  if(c.activo)cols.push('Estado');if(c.asist&&tenidas.length)cols.push('Asistencia');
+  const rows=[cols,...list.map((mb,i)=>{
+    const ap=c.asist&&tenidas.length?asistPct(mb.id):null;
+    let r=[i+1,mb.name];
+    if(c.grado)r.push(mb.grado||'');if(c.cargo)r.push(mb.cargo||'');
+    if(c.ingreso)r.push(fmes(mb.ingreso));if(c.email)r.push(mb.email||'');
+    if(c.celular)r.push(mb.celular||'');if(c.nacimiento)r.push(mb.fechaNacimiento||'');
+    if(c.activo)r.push(isActivo(mb)?'Activo':'Inactivo');
+    if(c.asist&&tenidas.length)r.push(ap?`${ap.n}/${ap.total} (${ap.pct}%)`:'0/'+tenidas.length);
+    return r;
+  })];
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=cols.map((_,i)=>({wch:i===1?30:18}));
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Nómina');
+  XLSX.writeFile(wb,`Nomina_${logiaDisplayName.replace(/\s/g,'_')}_${td()}.xlsx`);
+}
+function printNomina(){
+  const tbl=document.getElementById('nom-table');if(!tbl)return;
+  const w=window.open();
+  w.document.write(`<html><head><title>Nómina</title><style>body{font-family:'Segoe UI',sans-serif;padding:2rem;font-size:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px 8px}th{background:#1D2B4F;color:#fff}tr:nth-child(even)td{background:#f9f7f3}h2{font-size:16px;margin-bottom:4px}p{font-size:11px;color:#888;margin-bottom:12px}</style></head><body><h2>Nómina — ${logiaDisplayName}</h2><p>Generado: ${td()}</p>${tbl.outerHTML}</body></html>`);
+  w.document.close();w.print();
+}
+function printListaFirma(){
+  const list=getNominaList();
+  let rows=list.map((mb,i)=>`<tr><td style="padding:8px 10px;border:1px solid #ccc;font-size:12px">${i+1}</td><td style="padding:8px 10px;border:1px solid #ccc;font-size:12px;font-weight:500">${mb.name}</td><td style="padding:8px 10px;border:1px solid #ccc;font-size:11px;color:#666">${mb.grado||''}</td><td style="padding:8px 10px;border:1px solid #ccc;width:200px"></td></tr>`).join('');
+  const w=window.open();
+  w.document.write(`<html><head><title>Lista de asistencia</title><style>body{font-family:'Segoe UI',sans-serif;padding:2rem;font-size:12px}table{width:100%;border-collapse:collapse}th{background:#1D2B4F;color:#fff;padding:8px 10px;border:1px solid #ccc;font-size:12px}h2{font-size:16px;margin-bottom:4px}p{font-size:11px;color:#888;margin-bottom:12px}</style></head><body><h2>Lista de asistencia — ${logiaDisplayName}</h2><p>Fecha: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total hermanos: ${list.length}</p><table><thead><tr><th>N°</th><th>Nombre</th><th>Grado</th><th>Firma</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  w.document.close();w.print();
+}
+
+// ── ASISTENCIA ───────────────────────────────────────────────
+let tenidas=[],asistencias=[],ntid=1;
+function showAsistTab(id,btn){
+  document.querySelectorAll('#view-asistencia .tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['ast-tenidas','ast-registro','ast-resumen'].forEach(t=>document.getElementById(t).style.display='none');
+  document.getElementById(id).style.display='block';
+  if(id==='ast-tenidas')renderTenidasList();
+}
+function renderTenidasList(){
+  const sorted=[...tenidas].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  document.getElementById('ast-tenidas-list').innerHTML=sorted.length?sorted.map(t=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div><span style="font-weight:500;font-size:13px">${t.fecha}</span> &nbsp;·&nbsp; <span style="font-size:13px;color:var(--text2)">${t.titulo||'Sin descripción'}</span></div>
+      <button class="bd" onclick="delTenida(${t.id})">×</button>
+    </div>`).join(''):'<div class="empty">Sin tenidas registradas</div>';
+}
+function saveTenida(){
+  const fecha=document.getElementById('ast-fecha').value;
+  const titulo=document.getElementById('ast-titulo').value.trim();
+  if(!fecha){alert('Ingresa la fecha');return;}
+  tenidas.push({id:ntid++,fecha,titulo});
+  document.getElementById('ast-fecha').value='';document.getElementById('ast-titulo').value='';
+  schedSave();renderTenidasList();
+}
+function delTenida(id){
+  if(!confirm('¿Eliminar esta tenida y su registro de asistencia?'))return;
+  tenidas=tenidas.filter(t=>t.id!==id);
+  asistencias=asistencias.filter(a=>a.tenidaId!==id);
+  schedSave();renderTenidasList();
+}
+function renderAsistRegistro(){
+  const inclInact=document.getElementById('ast-incl-inactivos')?.checked;
+  const sorted=sortMiembros(inclInact?members:members.filter(isActivo));
+  const tSorted=[...tenidas].sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  if(!tSorted.length){document.getElementById('ast-tabla').innerHTML='<tr><td class="empty">No hay tenidas registradas. Agrégalas en la pestaña Tenidas.</td></tr>';return;}
+  const asistSet=new Set(asistencias.map(a=>a.tenidaId+'_'+a.memberId));
+  let html=`<thead><tr><th>Hermano</th>${tSorted.map(t=>`<th style="min-width:90px">${t.fecha}<br><small style="font-weight:normal">${t.titulo||''}</small></th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+  sorted.forEach(mb=>{
+    const tot=tSorted.filter(t=>asistSet.has(t.id+'_'+mb.id)).length;
+    html+=`<tr><td style="font-weight:500">${mb.name}</td>${tSorted.map(t=>{
+      const key=t.id+'_'+mb.id;const chk=asistSet.has(key);
+      return`<td><input type="checkbox" class="asist-cb" ${chk?'checked':''} onchange="toggleAsist(${t.id},${mb.id},this.checked)"></td>`;
+    }).join('')}<td style="font-weight:600;color:var(--navy)">${tot}/${tSorted.length}</td></tr>`;
+  });
+  html+=`</tbody>`;
+  document.getElementById('ast-tabla').innerHTML=html;
+}
+function toggleAsist(tenidaId,memberId,checked){
+  if(checked){asistencias.push({tenidaId,memberId});}
+  else{asistencias=asistencias.filter(a=>!(a.tenidaId===tenidaId&&a.memberId===memberId));}
+  schedSave();
+}
+function renderAsistResumen(){
+  const sorted=sortMiembros(members.filter(isActivo));
+  const total=tenidas.length;
+  if(!total){document.getElementById('ast-resumen-content').innerHTML='<div class="empty">No hay tenidas registradas aún.</div>';return;}
+  let html=`<table class="nom-tbl"><thead><tr><th>N°</th><th>Hermano</th><th>Grado</th><th>Asistencias</th><th>Total tenidas</th><th>%</th></tr></thead><tbody>`;
+  sorted.forEach((mb,i)=>{
+    const n=asistencias.filter(a=>a.memberId===mb.id).length;
+    const pct=Math.round(n/total*100);
+    const color=pct>=75?'var(--ok)':pct>=50?'var(--warn)':'var(--bad)';
+    html+=`<tr><td>${i+1}</td><td style="font-weight:500">${mb.name}</td><td>${mb.grado}</td><td style="color:${color};font-weight:600">${n}</td><td>${total}</td><td style="color:${color};font-weight:700">${pct}%</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  document.getElementById('ast-resumen-content').innerHTML=html;
+}
+function printAsistencia(){
+  const inclInact=document.getElementById('ast-incl-inactivos')?.checked;
+  const list=sortMiembros(inclInact?members:members.filter(isActivo));
+  let rows=list.map((mb,i)=>`<tr><td style="padding:10px 8px;border:1px solid #ccc">${i+1}</td><td style="padding:10px 8px;border:1px solid #ccc;font-weight:500">${mb.name}</td><td style="padding:10px 8px;border:1px solid #ccc;color:#666">${mb.grado}</td><td style="padding:10px 8px;border:1px solid #ccc;width:180px"></td></tr>`).join('');
+  const w=window.open();
+  w.document.write(`<html><head><title>Asistencia</title><style>body{font-family:'Segoe UI',sans-serif;padding:2rem;font-size:12px}table{width:100%;border-collapse:collapse}th{background:#1D2B4F;color:#fff;padding:8px;border:1px solid #ccc}h2{font-size:16px;margin-bottom:4px}p{color:#888;font-size:11px;margin-bottom:12px}</style></head><body><h2>${logiaDisplayName} — Lista de asistencia</h2><p>Fecha tenida: ___________________________</p><table><thead><tr><th>N°</th><th>Nombre</th><th>Grado</th><th>Firma</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  w.document.close();w.print();
+}
+
 function showView(id,btn){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
@@ -1473,20 +2007,104 @@ function showView(id,btn){
   if(id==='gastos')renderG();
   if(id==='ingresos')renderIN();
   if(id==='estado'){buildPeriodSelects();renderEC();}
+  if(id==='cobros')renderCobros();
+  if(id==='asistencia'){renderTenidasList();}
 }
 function showTab(id,btn){
   document.querySelectorAll('#view-reportes .tab').forEach(t=>t.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  ['rt-tes','rt-hno','rt-gas','rt-exc'].forEach(t=>document.getElementById(t).style.display='none');
+  ['rt-tes','rt-hno','rt-gas','rt-exc','rt-libro','rt-nomina'].forEach(t=>document.getElementById(t).style.display='none');
   document.getElementById(id).style.display='block';
   if(id==='rt-tes'||id==='rt-gas'||id==='rt-exc')renderRep();
+}
+function renderLibro(){
+  const today=cm();
+  const allMonths=[...payments.map(p=>p.fecha.slice(0,7)),...gastos.map(g=>g.fecha.slice(0,7)),...misc.map(m=>m.fecha.slice(0,7))].filter(Boolean).sort();
+  const autoFrom=allMonths[0]||today;
+  const autoTo=allMonths[allMonths.length-1]>today?allMonths[allMonths.length-1]:today;
+  const fromEl=document.getElementById('libro-desde');
+  const toEl=document.getElementById('libro-hasta');
+  if(!fromEl.value)fromEl.value=autoFrom;
+  if(!toEl.value)toEl.value=autoTo;
+  const from=fromEl.value;
+  const to=toEl.value;
+  const meses=getMesesInRange(from,to);
+  function cellHtml(mid,m){
+    const mb=members.find(x=>x.id===mid);
+    if(!mb||mb.ingreso>m)return'<td></td>';
+    if(isEx(mid,m)&&getTotalCobros(mid,m)===0)return'<td class="lc-ex">Exento</td>';
+    const paid=paidMeses(mid);
+    const partial=partialMeses(mid);
+    const due=getTotalDue(mid,m);
+    if(!due)return'<td></td>';
+    if(paid.has(m)){const cls=m>today?'lc-adv':'lc-paid';return`<td class="${cls}">${fm(due)}</td>`;}
+    if(partial[m]){const ab=partial[m];const pe=due-ab;return`<td style="background:#fff8ee"><div class="lc-part-p">${fm(ab)} ✓</div><div class="lc-part-r">${fm(pe)} ↑</div></td>`;}
+    if(m<today)return`<td class="lc-late">${fm(due)}</td>`;
+    if(m===today)return`<td class="lc-pend">${fm(due)}</td>`;
+    return`<td class="lc-ex" style="color:var(--text3)">—</td>`;
+  }
+  function saldoAntMember(mid){
+    const mb=members.find(x=>x.id===mid);if(!mb)return 0;
+    const paid=paidMeses(mid);let deuda=0,c=mb.ingreso<'2020-01'?'2020-01':mb.ingreso;
+    while(c<from){if(!paid.has(c)&&!isEx(mid,c))deuda+=mDeuda(mid,c);c=ma(c,1);}
+    return deuda;
+  }
+  const activos=sortMiembros(members.filter(mb=>mb.ingreso<=to&&isActivo(mb)));
+  let html=`<table class="libro-tbl"><thead><tr><th>Hermano</th><th>Saldo anterior</th>${meses.map(m=>`<th>${fmes(m)}</th>`).join('')}</tr></thead><tbody>`;
+  activos.forEach(mb=>{
+    const ant=saldoAntMember(mb.id);
+    const antCls=ant>0?'lc-late':'lc-paid';
+    html+=`<tr><td style="font-weight:500">${mb.name}</td><td class="${antCls}">${ant>0?fm(ant):'$0'}</td>${meses.map(m=>cellHtml(mb.id,m)).join('')}</tr>`;
+  });
+  html+=`<tr><td colspan="${2+meses.length}" style="padding:0;height:4px;background:var(--border)"></td></tr>`;
+  html+=`<tr class="libro-tot-row"><td>Cuotas recibidas</td><td></td>${meses.map(m=>{const t=payments.filter(p=>p.fecha.slice(0,7)===m&&p.tipo==='capita').reduce((a,p)=>a+p.monto,0);return`<td style="color:var(--ok)">${t?fm(t):'—'}</td>`;}).join('')}</tr>`;
+  html+=`<tr class="libro-tot-row"><td>Ingresos varios</td><td></td>${meses.map(m=>{const t=misc.filter(p=>p.fecha.slice(0,7)===m).reduce((a,p)=>a+p.monto,0);return`<td style="color:var(--ok)">${t?fm(t):'—'}</td>`;}).join('')}</tr>`;
+  html+=`<tr class="libro-tot-row"><td>Gastos</td><td></td>${meses.map(m=>{const t=gastos.filter(g=>g.fecha.slice(0,7)===m).reduce((a,g)=>a+g.monto,0);return`<td style="color:var(--bad)">${t?fm(t):'—'}</td>`;}).join('')}</tr>`;
+  const totalIng=payments.reduce((a,p)=>a+p.monto,0)+misc.reduce((a,p)=>a+p.monto,0);
+  const totalGas=gastos.reduce((a,g)=>a+g.monto,0);
+  const saldoFinal=totalIng-totalGas;
+  html+=`<tr class="libro-saldo-row"><td colspan="${2+meses.length}">Saldo acumulado a la fecha &nbsp;·&nbsp; Ingresos totales: ${fm(totalIng)} &nbsp;−&nbsp; Gastos totales: ${fm(totalGas)} &nbsp;=&nbsp; <span style="font-size:15px">${fm(saldoFinal)}</span></td></tr>`;
+  html+=`</tbody></table>`;
+  document.getElementById('libro-content').innerHTML=html;
+}
+function printLibro(){
+  const cont=document.getElementById('libro-content');
+  if(!cont||!cont.querySelector('table')){alert('No hay libro para imprimir. Genera primero el libro de cuotas.');return;}
+  const from=document.getElementById('libro-desde').value;
+  const to=document.getElementById('libro-hasta').value;
+  const w=window.open();
+  w.document.write(`<html><head><title>Libro de cuotas — ${logiaDisplayName}</title>
+  <style>
+    @page{size:landscape;margin:1cm}
+    body{font-family:'Segoe UI',sans-serif;padding:1.5rem;font-size:11px;color:#1a1a1a;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    h2{font-size:16px;margin-bottom:4px}
+    p{font-size:11px;color:#888;margin-bottom:12px}
+    table{border-collapse:collapse;font-size:11px;white-space:nowrap}
+    th,td{border:1px solid #e0dbd0;padding:5px 8px;text-align:right}
+    th{background:#1D2B4F;color:#fff;text-align:center;font-weight:500;font-size:10px}
+    td:first-child,th:first-child{text-align:left}
+    .lc-paid{background:#eaf3de;color:#2d6a2d;font-weight:500}
+    .lc-late{background:#fcebeb;color:#a32d2d;font-weight:500}
+    .lc-pend{background:#faeeda;color:#7a4f0a;font-weight:500}
+    .lc-adv{background:#e6f1fb;color:#0c4478;font-weight:500}
+    .lc-ex{background:#f9f7f3;color:#888;font-size:10px}
+    .lc-part-p{color:#2d6a2d;font-size:10px}
+    .lc-part-r{color:#a32d2d;font-size:10px}
+    .libro-tot-row td{background:#f9f7f3;font-weight:600}
+    .libro-saldo-row td{background:#1D2B4F;color:#fff;font-weight:700;text-align:center}
+  </style></head><body>
+  <h2>Libro de cuotas — ${logiaDisplayName}</h2>
+  <p>Período: ${fmes(from)} – ${fmes(to)} · Generado: ${td()}</p>
+  ${cont.innerHTML}
+  </body></html>`);
+  w.document.close();w.focus();setTimeout(()=>w.print(),400);
 }
 function showAdminTab(id,btn){
   document.querySelectorAll('#view-admin .tab').forEach(t=>t.classList.remove('active'));
   if(btn)btn.classList.add('active');
   ['ad-logias','ad-usuarios'].forEach(t=>document.getElementById(t).style.display='none');
   document.getElementById(id).style.display='block';
-  if(id==='ad-logias')loadLogias();
+  if(id==='ad-logias'){loadLogias();const wl=document.getElementById('wa-grupo-link');if(wl)wl.value=whatsappGrupo||'';}
   if(id==='ad-usuarios')loadUsers();
 }
 async function createLogia(){
@@ -1513,7 +2131,7 @@ async function loadLogias(){
   try{
     const snap = await firebase.firestore().collection('apps').get();
     const logias = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-    list.innerHTML = logias.map(l => `<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600">${l.name||l.id.replace(/_/g,' ').toUpperCase()}</div><div style="font-size:11px;color:var(--text2);font-family:monospace">ID: ${l.id}</div></div><button class="bd" onclick="deleteLogia('${l.id}')">Eliminar</button></div>`).join('') || 'No hay logias.';
+    list.innerHTML = logias.map(l => `<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:600">${l.name||l.id.replace(/_/g,' ').toUpperCase()}</div><div style="font-size:11px;color:var(--text2);font-family:monospace">ID: ${l.id}</div></div><div style="display:flex;gap:6px"><button class="btn bs bsm" style="color:var(--bad);border-color:var(--bad)" onclick="limpiarLogia('${l.id}','${(l.name||l.id).replace(/'/g,'&#39;')}')">Limpiar datos</button><button class="bd" onclick="deleteLogia('${l.id}')">Eliminar</button></div></div>`).join('') || 'No hay logias.';
     if(sel) logias.forEach(l => {
       const opt = document.createElement('option');
       opt.value = l.id;
@@ -1528,6 +2146,26 @@ async function deleteLogia(id){
     await firebase.firestore().doc(`apps/${id}`).delete();
     loadLogias();
     alert('Logia eliminada.');
+  }catch(e){alert('Error: '+e.message);}
+}
+async function limpiarLogia(id, nombre){
+  if(!confirm(`¿Limpiar TODOS los datos de "${nombre}"?\n\nEsto eliminará miembros, pagos, gastos y cobros de esta logia, dejándola vacía.\n\nEsta acción NO afecta otras logias.`))return;
+  try{
+    const docRef=firebase.firestore().doc(`apps/${id}`);
+    const snap=await docRef.get();
+    const existing=snap.exists?snap.data():{};
+    await docRef.set({
+      name:existing.name||nombre,
+      logo:existing.logo||'https://tesoreria-lda.github.io/tesoreria-lda/Logo_circle_transparent_background.png',
+      createdAt:existing.createdAt||new Date().toISOString(),
+      createdBy:existing.createdBy||firebase.auth().currentUser.email,
+      updatedAt:new Date().toISOString(),
+      members:[],fees:[],exemptions:[],payments:[],gastos:[],misc:[],credits:{},cobrosEspeciales:[],
+      nid:1,nmid:1,nexid:1,nfid:1,ngid:1,niid:1,nceid:1,v:4
+    });
+    localStorage.removeItem('lda_v4_'+id);
+    alert(`Datos de "${nombre}" limpiados correctamente.`);
+    loadLogias();
   }catch(e){alert('Error: '+e.message);}
 }
 async function uploadLogo(){
@@ -1589,6 +2227,167 @@ function refreshSel(){
   const opts=members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
   ['pf-m','ec-member','rh-sel'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<option value="">Seleccionar...</option>'+opts;});
 }
+// ── CUMPLEAÑOS / WHATSAPP ────────────────────────────────────
+let _waMode=''; // 'personal' o 'group'
+let _waMemberId=null;
+let _waCurrentVariant=0;
+
+function getTodayMMDD(){
+  const d=new Date();
+  return String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function getCumpleanosHoy(){
+  const mmdd=getTodayMMDD();
+  return members.filter(mb=>isActivo(mb)&&mb.fechaNacimiento&&mb.fechaNacimiento.slice(5)===mmdd);
+}
+
+function msgsPersonal(nombre){
+  return[
+`Querido H∴ ${nombre}:
+
+En este día venerable, los ojos del Taller se posan con fraternal afecto sobre ti. La Tesorería de la Logia ${logiaDisplayName} te eleva sus más sinceras congratulaciones por un nuevo aniversario en tu viaje hacia la Luz.
+
+Que el Gran Arquitecto del Universo ilumine cada paso de tu sendero, que la Escuadra rija tus obras y el Compás circunscriba tus deseos con sabiduría. Que los años que vienen te traigan salud, templanza y el gozo de continuar construyendo en este Taller de virtudes.
+
+Con el afecto fraternal de siempre,
+La Secretaría del Taller`,
+
+`Muy Querido H∴ ${nombre}:
+
+Hoy, al girar la rueda del tiempo y marcar un nuevo ciclo en tu existencia, la Logia ${logiaDisplayName} se une en fraternal júbilo para celebrar contigo este día.
+
+Que la sabiduría del Libro Sagrado guíe tu espíritu; que la fortaleza del pilar te sostenga en la adversidad, y que la belleza de la virtud embellezca cada jornada que el GADU te conceda. Muchos años de luz y prosperidad, H∴.
+
+Con profundo afecto fraternal,
+La Secretaría del Taller`,
+
+`H∴ ${nombre}:
+
+En el augusto lenguaje de nuestra Orden, un nuevo aniversario es más que el paso del tiempo: es un escalón más en la Gran Obra de perfeccionarse a sí mismo. La Tesorería de ${logiaDisplayName} celebra hoy ese camino que tú recorres con constancia.
+
+Que el triángulo luminoso del saber, la virtud y la belleza continúe presidiendo tu vida. Salud, prosperidad y Luz en abundancia, querido hermano.
+
+Fraternalmente,
+La Secretaría del Taller`
+  ];
+}
+
+function msgsGrupo(nombre){
+  return[
+`Queridos HH∴:
+
+La Secretaría del Taller se complace en anunciar que hoy celebra su onomástico el Querido H∴ ${nombre}.
+
+Unamos nuestras voces en fraternal congratulación y elevemos nuestros mejores deseos al GADU para que derrame sobre él salud, prosperidad y Luz inextinguible en su sendero.
+
+¡Que la Luz siempre lo acompañe, H∴ ${nombre}!
+
+La Secretaría del Taller
+${logiaDisplayName}`,
+
+`Muy Queridos HH∴:
+
+En este día, el Taller se detiene un instante en su labor para recordar con fraternal afecto que hoy cumple un nuevo año de vida nuestro Querido H∴ ${nombre}.
+
+Renovemos los lazos que nos unen con un sincero: ¡Salud, fortaleza y años de Luz, H∴ ${nombre}!
+
+Con el aprecio de todos,
+La Secretaría del Taller
+${logiaDisplayName}`,
+
+`HH∴ del Taller:
+
+Es motivo de alegría masónica comunicar que hoy celebra su aniversario el Querido H∴ ${nombre}. La cadena de unión que nos abraza se hace más vívida en este día para rodear con su calor a nuestro estimado hermano.
+
+Que el Gran Arquitecto del Universo le otorgue salud, paz y la perseverancia para continuar su búsqueda de la Luz.
+
+Fraternalmente,
+La Secretaría del Taller
+${logiaDisplayName}`
+  ];
+}
+
+function renderCumpleCard(){
+  const hoy=getCumpleanosHoy();
+  const el=document.getElementById('dash-cumple');
+  if(!el)return;
+  if(!hoy.length){el.innerHTML='';return;}
+  el.innerHTML=hoy.map(mb=>`
+    <div class="cumple-card">
+      <div class="cumple-title">🎂 Cumpleaños hoy</div>
+      <div class="cumple-name">H∴ ${mb.name}</div>
+      <div class="cumple-sub">${mb.grado}${mb.cargo?'  ·  '+mb.cargo:''}</div>
+      <div class="cumple-btns">
+        ${mb.celular?`<button class="cumple-btn cumple-btn-p" onclick="openWaModal('personal',${mb.id})">📱 Mensaje personal</button>`:'<span style="font-size:11px;color:rgba(255,255,255,.5)">Sin celular registrado</span>'}
+        <button class="cumple-btn cumple-btn-g" onclick="openWaModal('group',${mb.id})">👥 Mensaje al grupo</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openWaModal(mode, memberId){
+  _waMode=mode;
+  _waMemberId=memberId;
+  _waCurrentVariant=0;
+  const mb=members.find(x=>x.id===memberId);
+  if(!mb)return;
+  document.getElementById('wa-modal-title').textContent=mode==='personal'?'Mensaje personal de cumpleaños':'Mensaje al grupo de cumpleaños';
+  document.getElementById('wa-send-btn').textContent=mode==='personal'?'Abrir chat WhatsApp ↗':'Abrir enlace de grupo ↗';
+  // Reset variant buttons
+  document.querySelectorAll('.wa-var-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  const msgs=mode==='personal'?msgsPersonal(mb.name):msgsGrupo(mb.name);
+  document.getElementById('wa-msg-area').value=msgs[0];
+  document.getElementById('wa-modal').style.display='flex';
+}
+
+function setWaVariant(idx,btn){
+  _waCurrentVariant=idx;
+  document.querySelectorAll('.wa-var-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const mb=members.find(x=>x.id===_waMemberId);
+  if(!mb)return;
+  const msgs=_waMode==='personal'?msgsPersonal(mb.name):msgsGrupo(mb.name);
+  document.getElementById('wa-msg-area').value=msgs[idx]||msgs[0];
+}
+
+function sendWaMsg(){
+  const txt=document.getElementById('wa-msg-area').value.trim();
+  if(!txt)return;
+  if(_waMode==='personal'){
+    const mb=members.find(x=>x.id===_waMemberId);
+    if(!mb||!mb.celular){alert('Este hermano no tiene celular registrado.');return;}
+    // Clean phone: remove +, spaces, dashes; assume Chilean numbers
+    let phone=mb.celular.replace(/[\s\-\(\)]/g,'');
+    if(!phone.startsWith('+'))phone='56'+phone.replace(/^0/,'');
+    else phone=phone.replace('+','');
+    window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(txt),'_blank');
+  } else {
+    if(whatsappGrupo){
+      // Copy text to clipboard then open group link
+      navigator.clipboard.writeText(txt).then(()=>{
+        window.open(whatsappGrupo,'_blank');
+      }).catch(()=>{
+        window.open(whatsappGrupo+'?text='+encodeURIComponent(txt),'_blank');
+      });
+    } else {
+      // No group link: use generic wa.me share
+      window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+    }
+  }
+  closeWaModal();
+}
+
+function closeWaModal(){document.getElementById('wa-modal').style.display='none';}
+
+async function saveWhatsappGrupo(){
+  const val=document.getElementById('wa-grupo-link').value.trim();
+  try{
+    await firebase.firestore().doc(`apps/${selectedLogia}`).update({whatsappGrupo:val});
+    whatsappGrupo=val;
+    alert('Enlace guardado correctamente.');
+  }catch(e){alert('Error al guardar: '+e.message);}
+}
+
 function renderAll(){buildPeriodSelects();refreshSel();renderDash();renderM();renderFF();renderG();renderIN();}
 
 // ── INIT ─────────────────────────────────────────────────────
@@ -1612,5 +2411,6 @@ window.addEventListener('load',()=>{
   initFirebase();
 });
 </script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </body>
 </html>
