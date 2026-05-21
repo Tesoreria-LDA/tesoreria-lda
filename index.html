@@ -171,6 +171,19 @@ tr:hover td{background:var(--surface2)}
 .cumple-btn-p:hover{background:#c49530}
 .cumple-btn-g{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
 .cumple-btn-g:hover{background:rgba(255,255,255,.2)}
+.cumple-group{margin-top:14px}
+.cumple-group-h{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;border-bottom:1px solid rgba(212,168,67,.25);padding-bottom:3px}
+.cumple-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.cumple-row:last-child{border-bottom:none}
+.cumple-row-info{flex:1;min-width:0}
+.cumple-row .cumple-name{font-size:14px;margin-bottom:1px}
+.cumple-row .cumple-sub{margin-bottom:0}
+.cumple-row .cumple-btns{flex-shrink:0;flex-wrap:nowrap}
+.cumple-row .cumple-btn{padding:6px 11px;font-size:11px}
+.cumple-chip{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:2px;vertical-align:middle}
+.chip-hoy{background:var(--gold);color:#1a3050}
+.chip-pas{background:rgba(255,255,255,.16);color:rgba(255,255,255,.85)}
+.chip-fut{background:rgba(212,168,67,.22);color:var(--gold)}
 /* ── MODAL PREVIEW WA ── */
 .wa-modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem}
 .wa-modal{background:var(--surface);border-radius:var(--radius);width:100%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
@@ -285,6 +298,7 @@ tr:hover td{background:var(--surface2)}
     </div>
     <div class="wa-modal-foot">
       <button class="btn bs" onclick="closeWaModal()">Cancelar</button>
+      <button class="btn bs" id="wa-copy-btn" onclick="copyWaMsg()">📋 Copiar texto</button>
       <button class="btn bp" id="wa-send-btn" onclick="sendWaMsg()">Abrir en WhatsApp ↗</button>
     </div>
   </div>
@@ -2231,22 +2245,75 @@ function refreshSel(){
 let _waMode=''; // 'personal' o 'group'
 let _waMemberId=null;
 let _waCurrentVariant=0;
+let _waEstado='hoy'; // 'pasado' | 'hoy' | 'futuro'
 
-function getTodayMMDD(){
-  const d=new Date();
-  return String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const MESES_CUMPLE=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+// Calcula la posición del cumpleaños dentro de la ventana de 5 meses:
+// 2 meses anteriores al actual, mes actual y 2 meses siguientes.
+// Devuelve null si la fecha no es válida o cae fuera de la ventana.
+function cumpleCalc(fechaNac){
+  if(!fechaNac)return null;
+  const p=String(fechaNac).split('-');
+  if(p.length<3)return null;
+  const bm=parseInt(p[1],10)-1, bd=parseInt(p[2],10);
+  if(isNaN(bm)||isNaN(bd))return null;
+  const now=new Date();
+  const curY=now.getFullYear(), curM=now.getMonth(), curD=now.getDate();
+  // Desfase de meses respecto del mes actual, normalizado al rango -6..+6
+  let off=bm-curM;
+  if(off>6)off-=12;
+  if(off<-6)off+=12;
+  if(off<-2||off>2)return null; // fuera de la ventana de 5 meses
+  // Fecha de la ocurrencia del cumpleaños en la ventana (ajusta meses cortos)
+  const lastDay=new Date(curY,curM+off+1,0).getDate();
+  const occ=new Date(curY,curM+off,Math.min(bd,lastDay));
+  const today0=new Date(curY,curM,curD);
+  const diffDays=Math.round((occ-today0)/86400000);
+  const estado=diffDays<0?'pasado':(diffDays===0?'hoy':'futuro');
+  const bucket=off<0?'pasados':(off>0?'futuros':'actuales');
+  return {bm:bm,bd:bd,off:off,occ:occ,diffDays:diffDays,estado:estado,bucket:bucket};
 }
 
-function getCumpleanosHoy(){
-  const mmdd=getTodayMMDD();
-  return members.filter(mb=>isActivo(mb)&&mb.fechaNacimiento&&mb.fechaNacimiento.slice(5)===mmdd);
+// QQ∴HH∴ activos con cumpleaños dentro de la ventana de 5 meses.
+function getCumpleData(){
+  const arr=[];
+  members.forEach(mb=>{
+    if(!isActivo(mb))return;
+    const c=cumpleCalc(mb.fechaNacimiento);
+    if(c)arr.push(Object.assign({mb:mb},c));
+  });
+  return arr;
 }
 
-function msgsPersonal(nombre){
+// Etiqueta visual (chip) según el cumpleaños sea pasado, hoy o futuro.
+function cumpleChip(c){
+  if(c.estado==='hoy')return '<span class="cumple-chip chip-hoy">¡Hoy!</span>';
+  if(c.estado==='pasado'){
+    const n=Math.abs(c.diffDays);
+    return '<span class="cumple-chip chip-pas">hace '+n+(n===1?' día':' días')+'</span>';
+  }
+  const n=c.diffDays;
+  return '<span class="cumple-chip chip-fut">en '+n+(n===1?' día':' días')+'</span>';
+}
+
+function msgsPersonal(nombre, estado){
+  const E=estado||'hoy';
+  // Variante 1: apertura temporal + matiz del saludo
+  const v1ap={hoy:'En este día venerable',futuro:'En la cercanía de tu día venerable',pasado:'A pocos días de tu venerable aniversario'}[E];
+  const v1mz={hoy:'',futuro:'por anticipado ',pasado:'con fraternal retraso '}[E];
+  // Variante 2: párrafo inicial completo
+  const v2p1={
+    hoy:`Hoy, al girar la rueda del tiempo y marcar un nuevo ciclo en tu existencia, la Logia ${logiaDisplayName} se une en fraternal júbilo para celebrar contigo este día.`,
+    futuro:`Próximo a girar la rueda del tiempo que marcará un nuevo ciclo en tu existencia, la Logia ${logiaDisplayName} se une por anticipado en fraternal júbilo para celebrar contigo ese día.`,
+    pasado:`Recién girada la rueda del tiempo que marcó un nuevo ciclo en tu existencia, la Logia ${logiaDisplayName} se une en fraternal júbilo para celebrar contigo ese día.`
+  }[E];
+  // Variante 3: verbo de la celebración
+  const v3cl={hoy:'celebra hoy',futuro:'celebrará pronto',pasado:'celebró hace pocos días'}[E];
   return[
 `Querido H∴ ${nombre}:
 
-En este día venerable, los ojos del Taller se posan con fraternal afecto sobre ti. La Tesorería de la Logia ${logiaDisplayName} te eleva sus más sinceras congratulaciones por un nuevo aniversario en tu viaje hacia la Luz.
+${v1ap}, los ojos del Taller se posan con fraternal afecto sobre ti. La Tesorería de la Logia ${logiaDisplayName} te eleva ${v1mz}sus más sinceras congratulaciones por un nuevo aniversario en tu viaje hacia la Luz.
 
 Que el Gran Arquitecto del Universo ilumine cada paso de tu sendero, que la Escuadra rija tus obras y el Compás circunscriba tus deseos con sabiduría. Que los años que vienen te traigan salud, templanza y el gozo de continuar construyendo en este Taller de virtudes.
 
@@ -2255,7 +2322,7 @@ La Secretaría del Taller`,
 
 `Muy Querido H∴ ${nombre}:
 
-Hoy, al girar la rueda del tiempo y marcar un nuevo ciclo en tu existencia, la Logia ${logiaDisplayName} se une en fraternal júbilo para celebrar contigo este día.
+${v2p1}
 
 Que la sabiduría del Libro Sagrado guíe tu espíritu; que la fortaleza del pilar te sostenga en la adversidad, y que la belleza de la virtud embellezca cada jornada que el GADU te conceda. Muchos años de luz y prosperidad, H∴.
 
@@ -2264,7 +2331,7 @@ La Secretaría del Taller`,
 
 `H∴ ${nombre}:
 
-En el augusto lenguaje de nuestra Orden, un nuevo aniversario es más que el paso del tiempo: es un escalón más en la Gran Obra de perfeccionarse a sí mismo. La Tesorería de ${logiaDisplayName} celebra hoy ese camino que tú recorres con constancia.
+En el augusto lenguaje de nuestra Orden, un nuevo aniversario es más que el paso del tiempo: es un escalón más en la Gran Obra de perfeccionarse a sí mismo. La Tesorería de ${logiaDisplayName} ${v3cl} ese camino que tú recorres con constancia.
 
 Que el triángulo luminoso del saber, la virtud y la belleza continúe presidiendo tu vida. Salud, prosperidad y Luz en abundancia, querido hermano.
 
@@ -2273,11 +2340,26 @@ La Secretaría del Taller`
   ];
 }
 
-function msgsGrupo(nombre){
+function msgsGrupo(nombre, estado){
+  const E=estado||'hoy';
+  // Variante 1: verbo de la celebración
+  const g1cl={hoy:'hoy celebra su onomástico',futuro:'próximamente celebrará su onomástico',pasado:'celebró días atrás su onomástico'}[E];
+  // Variante 2: párrafo inicial completo
+  const g2p1={
+    hoy:`En este día, el Taller se detiene un instante en su labor para recordar con fraternal afecto que hoy cumple un nuevo año de vida nuestro Querido H∴ ${nombre}.`,
+    futuro:`El Taller se detiene un instante en su labor para recordar con fraternal afecto que en los próximos días cumplirá un nuevo año de vida nuestro Querido H∴ ${nombre}.`,
+    pasado:`El Taller se detiene un instante en su labor para recordar con fraternal afecto que en días recientes cumplió un nuevo año de vida nuestro Querido H∴ ${nombre}.`
+  }[E];
+  // Variante 3: párrafo inicial completo
+  const g3p1={
+    hoy:`Es motivo de alegría masónica comunicar que hoy celebra su aniversario el Querido H∴ ${nombre}. La cadena de unión que nos abraza se hace más vívida en este día para rodear con su calor a nuestro estimado hermano.`,
+    futuro:`Es motivo de alegría masónica comunicar que pronto celebrará su aniversario el Querido H∴ ${nombre}. La cadena de unión que nos abraza se apresta a hacerse más vívida para rodear con su calor a nuestro estimado hermano.`,
+    pasado:`Es motivo de alegría masónica comunicar que hace pocos días celebró su aniversario el Querido H∴ ${nombre}. La cadena de unión que nos abraza se hace más vívida para rodear con su calor a nuestro estimado hermano.`
+  }[E];
   return[
 `Queridos HH∴:
 
-La Secretaría del Taller se complace en anunciar que hoy celebra su onomástico el Querido H∴ ${nombre}.
+La Secretaría del Taller se complace en anunciar que ${g1cl} el Querido H∴ ${nombre}.
 
 Unamos nuestras voces en fraternal congratulación y elevemos nuestros mejores deseos al GADU para que derrame sobre él salud, prosperidad y Luz inextinguible en su sendero.
 
@@ -2288,7 +2370,7 @@ ${logiaDisplayName}`,
 
 `Muy Queridos HH∴:
 
-En este día, el Taller se detiene un instante en su labor para recordar con fraternal afecto que hoy cumple un nuevo año de vida nuestro Querido H∴ ${nombre}.
+${g2p1}
 
 Renovemos los lazos que nos unen con un sincero: ¡Salud, fortaleza y años de Luz, H∴ ${nombre}!
 
@@ -2298,7 +2380,7 @@ ${logiaDisplayName}`,
 
 `HH∴ del Taller:
 
-Es motivo de alegría masónica comunicar que hoy celebra su aniversario el Querido H∴ ${nombre}. La cadena de unión que nos abraza se hace más vívida en este día para rodear con su calor a nuestro estimado hermano.
+${g3p1}
 
 Que el Gran Arquitecto del Universo le otorgue salud, paz y la perseverancia para continuar su búsqueda de la Luz.
 
@@ -2309,21 +2391,37 @@ ${logiaDisplayName}`
 }
 
 function renderCumpleCard(){
-  const hoy=getCumpleanosHoy();
   const el=document.getElementById('dash-cumple');
   if(!el)return;
-  if(!hoy.length){el.innerHTML='';return;}
-  el.innerHTML=hoy.map(mb=>`
-    <div class="cumple-card">
-      <div class="cumple-title">🎂 Cumpleaños hoy</div>
-      <div class="cumple-name">H∴ ${mb.name}</div>
-      <div class="cumple-sub">${mb.grado}${mb.cargo?'  ·  '+mb.cargo:''}</div>
-      <div class="cumple-btns">
-        ${mb.celular?`<button class="cumple-btn cumple-btn-p" onclick="openWaModal('personal',${mb.id})">📱 Mensaje personal</button>`:'<span style="font-size:11px;color:rgba(255,255,255,.5)">Sin celular registrado</span>'}
-        <button class="cumple-btn cumple-btn-g" onclick="openWaModal('group',${mb.id})">👥 Mensaje al grupo</button>
-      </div>
-    </div>
-  `).join('');
+  const data=getCumpleData();
+  if(!data.length){el.innerHTML='';return;}
+  const grupos=[
+    {key:'pasados', label:'Atrasados · meses anteriores', sort:(a,b)=>b.diffDays-a.diffDays},
+    {key:'actuales',label:'Este mes',                     sort:(a,b)=>a.bd-b.bd},
+    {key:'futuros', label:'Próximos · meses siguientes',  sort:(a,b)=>a.diffDays-b.diffDays}
+  ];
+  let html='<div class="cumple-card"><div class="cumple-title">🎂 Cumpleaños de QQ∴HH∴</div>';
+  let total=0;
+  grupos.forEach(g=>{
+    const list=data.filter(d=>d.bucket===g.key).sort(g.sort);
+    if(!list.length)return;
+    total+=list.length;
+    html+='<div class="cumple-group"><div class="cumple-group-h">'+g.label+' ('+list.length+')</div>';
+    list.forEach(d=>{
+      const mb=d.mb;
+      const fecha=d.bd+' de '+MESES_CUMPLE[d.bm];
+      html+='<div class="cumple-row"><div class="cumple-row-info">'
+        +'<div class="cumple-name">H∴ '+(mb.name||'')+'</div>'
+        +'<div class="cumple-sub">'+(mb.grado||'')+(mb.cargo?' · '+mb.cargo:'')+' · 📅 '+fecha+' '+cumpleChip(d)+'</div>'
+        +'</div><div class="cumple-btns">'
+        +(mb.celular?'<button class="cumple-btn cumple-btn-p" onclick="openWaModal(\'personal\','+mb.id+')">📱 Personal</button>':'')
+        +'<button class="cumple-btn cumple-btn-g" onclick="openWaModal(\'group\','+mb.id+')">👥 Grupo</button>'
+        +'</div></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  el.innerHTML=total?html:'';
 }
 
 function openWaModal(mode, memberId){
@@ -2332,11 +2430,14 @@ function openWaModal(mode, memberId){
   _waCurrentVariant=0;
   const mb=members.find(x=>x.id===memberId);
   if(!mb)return;
-  document.getElementById('wa-modal-title').textContent=mode==='personal'?'Mensaje personal de cumpleaños':'Mensaje al grupo de cumpleaños';
+  const c=cumpleCalc(mb.fechaNacimiento);
+  _waEstado=c?c.estado:'hoy';
+  const etiq={hoy:'cumpleaños de hoy',futuro:'saludo anticipado',pasado:'saludo atrasado'}[_waEstado];
+  document.getElementById('wa-modal-title').textContent=(mode==='personal'?'Mensaje personal':'Mensaje al grupo')+' · '+etiq;
   document.getElementById('wa-send-btn').textContent=mode==='personal'?'Abrir chat WhatsApp ↗':'Abrir enlace de grupo ↗';
   // Reset variant buttons
   document.querySelectorAll('.wa-var-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
-  const msgs=mode==='personal'?msgsPersonal(mb.name):msgsGrupo(mb.name);
+  const msgs=mode==='personal'?msgsPersonal(mb.name,_waEstado):msgsGrupo(mb.name,_waEstado);
   document.getElementById('wa-msg-area').value=msgs[0];
   document.getElementById('wa-modal').style.display='flex';
 }
@@ -2346,7 +2447,7 @@ function setWaVariant(idx,btn){
   document.querySelectorAll('.wa-var-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
   const mb=members.find(x=>x.id===_waMemberId);
   if(!mb)return;
-  const msgs=_waMode==='personal'?msgsPersonal(mb.name):msgsGrupo(mb.name);
+  const msgs=_waMode==='personal'?msgsPersonal(mb.name,_waEstado):msgsGrupo(mb.name,_waEstado);
   document.getElementById('wa-msg-area').value=msgs[idx]||msgs[0];
 }
 
@@ -2378,6 +2479,20 @@ function sendWaMsg(){
 }
 
 function closeWaModal(){document.getElementById('wa-modal').style.display='none';}
+
+// Copia el texto del mensaje al portapapeles, para enviarlo manualmente
+// (saludos anticipados o atrasados que no se abren directo en WhatsApp).
+function copyWaMsg(){
+  const ta=document.getElementById('wa-msg-area');
+  if(!ta||!ta.value.trim())return;
+  const btn=document.getElementById('wa-copy-btn');
+  const feedback=()=>{if(btn){const o=btn.textContent;btn.textContent='✓ Copiado';setTimeout(()=>{btn.textContent=o;},1800);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ta.value).then(feedback).catch(()=>{ta.select();document.execCommand('copy');feedback();});
+  } else {
+    ta.select();document.execCommand('copy');feedback();
+  }
+}
 
 async function saveWhatsappGrupo(){
   const val=document.getElementById('wa-grupo-link').value.trim();
